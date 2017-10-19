@@ -14,13 +14,12 @@ GameState.prototype.init = function() {
 
   this.matterEngine = Matter.Engine.create();
   this.physicsBall = Matter.Bodies.circle(0, 0, 1, { density: 0.04, frictionAir: 0.005});
+  this.anchorPoint = {x: 5, y: 5};
   Matter.World.add(this.matterEngine.world, this.physicsBall);
   Matter.World.add(this.matterEngine.world, Matter.Constraint.create({
-            pointA: { x: 5, y: 5 },
+            pointA: this.anchorPoint,
             bodyB: this.physicsBall
                   }));
-
-  this.rotDz = 0;
 };
 
 GameState.prototype.pause = function() {
@@ -37,18 +36,19 @@ GameState.prototype.render = function(renderer) {
 };
 
 GameState.prototype.update = function() {
+  const forceMultiplier = 0.0006;
+  const p1 = this.anchorPoint;
+  const p2 = this.physicsBall.position;
+  const rotated = Matter.Vector.rotate({x: p2.x - p1.x, y: p2.y - p1.y}, Math.PI / 2);
+  const normalised = Matter.Vector.normalise(rotated);
   if(KEYS[37]) {
-    this.rotDz += 0.01;
+    const force = Matter.Vector.mult(normalised, -forceMultiplier);
+    Matter.Body.applyForce(this.physicsBall, this.physicsBall.position, force);
   }
   if(KEYS[39]) {
-    this.rotDz -= 0.01;
+    const force = Matter.Vector.mult(normalised, forceMultiplier);
+    Matter.Body.applyForce(this.physicsBall, this.physicsBall.position, force);
   }
-
-  this.rotDz *= 0.98;
-  if(this.rotDz > 2) {
-    this.rotDz = 2;
-  }
-  this.ball.rotation.z += this.rotDz;
 
   Matter.Engine.update(this.matterEngine);
 };
