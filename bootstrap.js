@@ -73,6 +73,7 @@ function bootstrap() {
   renderer = new THREE.WebGLRenderer();
   document.body.appendChild(renderer.domElement);
   canvas = renderer.domElement;
+  renderer.setClearColor(new THREE.Color(0.05, 0.05, 0.05));
 
   sm = new StateManager();
 
@@ -115,7 +116,7 @@ function resize(e) {
   } else {
     GU = (window.innerWidth / 16);
   }
-  renderer.setSize(16 * GU / 2, 9 * GU / 2);
+  renderer.setSize(16 * GU, 9 * GU);
   canvas.style.margin = ((window.innerHeight - 9 * GU) / 2) + "px 0 0 " + ((window.innerWidth - 16 * GU) / 2) + "px";
 }
 

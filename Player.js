@@ -2,13 +2,21 @@ function Player(game, options) {
   this.options = options;
   this.game = game;
   this.mesh = new THREE.Mesh(
-    new THREE.SphereGeometry(20, 1, 1),
-    new THREE.MeshBasicMaterial({color: this.options.color}));
+    new THREE.BoxGeometry(30, 30, 30),
+    new THREE.MeshStandardMaterial({
+      color: this.options.color,
+      shading: THREE.FlatShading,
+    }));
   this.body = Matter.Bodies.circle(
       0, 0, 10, { density: 0.004, frictionAir: 0.005});
   Matter.Body.setPosition(this.body, this.options.position);
   this.currentAnchor = undefined;
   this.score = 0;
+  this.ropeMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 5, 5),
+    new THREE.MeshStandardMaterial({
+      color: 0x444444,
+    }));
 }
 
 Player.prototype.render = function() {
@@ -27,8 +35,28 @@ Player.prototype.updateScore = function() {
   this.score += numCapturedAnchors / FPS;
 };
 
+Player.prototype.updateRope = function() {
+  const angle = Matter.Vector.angle(
+      Matter.Vector.sub(
+        this.currentAnchor.position,
+        this.body.position),
+      {x: 1, y: 0});
+  const midpoint = Matter.Vector.mult(
+    Matter.Vector.sub(this.currentAnchor.position,
+                      this.body.position),
+    0.5);
+  const ropePosition = Matter.Vector.add(midpoint, this.body.position);
+  const length = Matter.Vector.magnitude(midpoint);
+  this.ropeMesh.scale.set(length, 1, 1);
+  this.ropeMesh.position.x = ropePosition.x;
+  this.ropeMesh.position.y = ropePosition.y;
+  this.ropeMesh.rotation.z = angle;
+};
+
 Player.prototype.update = function() {
-  if (this.currentAnchor) {
+  this.mesh.rotation.x += 0.05;
+  this.mesh.rotation.y += 0.03;
+  if(this.currentAnchor) {
     const forceMultiplier = 0.00005;
     const p1 = this.currentAnchor.position;
     const p2 = this.body.position;
@@ -80,6 +108,7 @@ Player.prototype.update = function() {
     if(this.currentAnchor.capturePercentage >= 1) {
       this.currentAnchor.owner = this;
     }
+    this.updateRope();
   } else {
     for(let anchor of this.game.anchors) {
       const distanceSquared = Matter.Vector.magnitudeSquared(
@@ -124,11 +153,13 @@ Player.prototype.update = function() {
         });
         Matter.Composite.add(this.game.matterEngine.world,
                              this.currentRopeConstraintBall);
+        this.game.scene.add(this.ropeMesh);
+        this.updateRope();
         break;
       }
     }
   }
-  if (KEYS[this.options.keys.jump]) {
+  if(KEYS[this.options.keys.jump]) {
     Matter.Composite.remove(this.game.matterEngine.world,
                             this.currentRope);
     Matter.Composite.remove(this.game.matterEngine.world,
@@ -136,6 +167,7 @@ Player.prototype.update = function() {
     Matter.Composite.remove(this.game.matterEngine.world,
                             this.currentRopeConstraintBall);
     this.currentAnchor = undefined;
+    this.game.scene.remove(this.ropeMesh);
   }
   this.updateScore();
 };
