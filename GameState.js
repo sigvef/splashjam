@@ -10,15 +10,39 @@ GameState.prototype.init = function() {
   this.camera.position.z = -2000;
   this.camera.rotation.y = Math.PI;
   this.camera.rotation.z = Math.PI;
-  this.ball = new THREE.Mesh(
-      new THREE.SphereGeometry(20, 1, 1),
-      new THREE.MeshBasicMaterial({color: 0xff0000}));
-  this.scene.add(this.ball);
-  this.ball.position.x = -2000;
-  this.currentAnchor = undefined;
-
   this.matterEngine = Matter.Engine.create();
-
+  this.player1 = new Player(this, {
+    keys: {
+      jump: 32,
+      up: 38,
+      down: 40,
+      left: 37,
+      right: 39,
+    },
+    position: {
+      x: -600,
+      y: -100,
+    },
+    color: 'red',
+  });
+  this.player2 = new Player(this, {
+    keys: {
+      jump: 69,
+      up: 87,
+      down: 83,
+      left: 65,
+      right: 68,
+    },
+    position: {
+      x: 600,
+      y: -100,
+    },
+    color: 'green',
+  });
+  this.scene.add(this.player1.mesh);
+  this.scene.add(this.player2.mesh);
+  Matter.World.add(this.matterEngine.world, this.player1.body);
+  Matter.World.add(this.matterEngine.world, this.player2.body);
   var render = Matter.Render.create({
         element: document.body,
         engine: this.matterEngine,
@@ -28,25 +52,11 @@ GameState.prototype.init = function() {
           showVelocity: true
         }
   });
-
   Matter.Render.run(render);
   Matter.Render.lookAt(render, {
             min: { x: -800, y: -600 },
             max: { x: 800, y: 600 }
                 });
-
-
-  /* density: weight of the ball
-   * frictionAir: the amount of friction in the air, I think. The bigger the number, the more friction */
-
-  this.physicsBall = Matter.Bodies.circle(0, 0, 10, { density: 0.004, frictionAir: 0.005});
-  this.physicsBall.position.x = 1;
-
-  this.anchorPoint = undefined;
-  this.currentConstraint = undefined;
-  Matter.World.add(this.matterEngine.world, this.physicsBall);
-
-
   const anchorPrototype = new THREE.Mesh(
       new THREE.SphereGeometry(20, 1, 1),
       new THREE.MeshBasicMaterial({color: 0x0000ff}));
@@ -76,124 +86,22 @@ GameState.prototype.resume = function() {
 };
 
 GameState.prototype.render = function(renderer) {
-  this.ball.position.x = this.physicsBall.position.x;
-  this.ball.position.y = this.physicsBall.position.y;
-  this.ball.rotation.z = this.physicsBall.angle;
+  this.player1.render();
+  this.player2.render();
   for(let anchor of this.anchors) {
     anchor.material.color.setRGB(0, 0, 255);
-    if(anchor == this.currentAnchor) {
-      anchor.material.color.setRGB(0, 255, 0);
-    }
-    if(anchor.owner == 'player1') {
+    if(anchor.owner == this.player1) {
       anchor.material.color.setRGB(0, 255, 255);
+    }
+    if(anchor.owner == this.player2) {
+      anchor.material.color.setRGB(255, 0, 255);
     }
   }
   renderer.render(this.scene, this.camera);
 };
 
 GameState.prototype.update = function() {
-  if(this.anchorPoint) {
-    /* forceMultiplier: the bigger this is, the more force we apply to the ball when we push the arrow keys */
-    const forceMultiplier = 0.00005;
-    const p1 = this.anchorPoint;
-    const p2 = this.physicsBall.position;
-    const rotated = Matter.Vector.rotate({x: p2.x - p1.x, y: p2.y - p1.y}, Math.PI / 2);
-    const normalised = Matter.Vector.normalise(rotated);
-    if(KEYS[37]) {
-      Matter.Body.applyForce(
-        this.physicsBall,
-        this.physicsBall.position,
-        {x: -0.001, y: 0});
-    }
-    if(KEYS[39]) {
-      Matter.Body.applyForce(
-        this.physicsBall,
-        this.physicsBall.position,
-        {x: 0.001, y: 0});
-    }
-    if(KEYS[38]) {
-      Matter.Body.applyForce(
-        this.physicsBall,
-        this.physicsBall.position,
-        {x: 0, y: -0.001});
-    }
-    if(KEYS[40]) {
-      Matter.Body.applyForce(
-        this.physicsBall,
-        this.physicsBall.position,
-        {x: 0, y: 0.001});
-    }
-
-    const angle = Matter.Vector.angle(Matter.Vector.sub(this.anchorPoint, this.physicsBall.position), {x: 1, y: 0});
-    this.grabRotationPrevious = this.grabRotationAmount;
-    let angleDelta = angle - (this.grabRotationPrevious % (Math.PI * 2));
-    if(angleDelta > Math.PI + 0.0000001) {
-      angleDelta -= Math.PI * 2;
-    }
-    if(angleDelta < -Math.PI - 0.00000001) {
-      angleDelta += Math.PI * 2;
-    }
-    this.grabRotationAmount += angleDelta;
-    this.currentAnchor.capturePercentage = Math.abs(this.grabRotationAmount) / Math.PI / 2;
-    console.log(this.currentAnchor.capturePercentage);
-    if(this.currentAnchor.capturePercentage >= 1) {
-      this.currentAnchor.owner = 'player1';
-    }
-  } else {
-    for(let anchor of this.anchors) {
-      const distanceSquared = Matter.Vector.magnitudeSquared(Matter.Vector.sub(this.physicsBall.position, anchor.position));
-      if(distanceSquared < 10000) {
-        this.currentAnchor = anchor;
-        this.anchorPoint = anchor.body.position;
-        const angle = Matter.Vector.angle(Matter.Vector.sub(anchor.body.position, this.physicsBall.position), {x: 1, y: 0});
-        this.grabRotationStart = angle;
-        this.grabRotationPrevious = angle;
-        this.grabRotationAmount = 0;
-        var group = Matter.Body.nextGroup(true);
-        this.currentRope = Matter.Composites.stack(0, 0, 5, 1, 1, 1, (x, y) => {
-          return Matter.Bodies.rectangle(
-            x, y, 2, 2, {collisionFilter: {group}});
-        });
-
-        Matter.Composites.chain(this.currentRope, 0.5, 0, -0.5, 0, { stiffness: 0.99999, length: 1, render: { type: 'line' } });
-
-        this.currentRopeConstraintAnchor = Matter.Constraint.create({
-          bodyA: this.currentRope.bodies[0],
-          bodyB: anchor.body,
-          length: 0,
-        });
-        Matter.Composite.add(this.matterEngine.world,
-                             this.currentRopeConstraintAnchor);
-        Matter.World.add(this.matterEngine.world, this.currentRope);
-        this.currentRopeConstraintBall = Matter.Constraint.create({
-          bodyA: this.currentRope.bodies[this.currentRope.bodies.length-1],
-          bodyB: this.physicsBall,
-          length: 0,
-        });
-        Matter.Composite.add(this.matterEngine.world,
-                             this.currentRopeConstraintBall)
-        break;
-      }
-    }
-  }
-
-  for(let anchor of this.anchors) {
-    if(anchor.body.position == this.anchorPoint) {
-      anchor.material.color.setRGB(0, 255, 0);
-    } else {
-      anchor.material.color.setRGB(0, 0, 255);
-    }
-  }
-
-  if(KEYS[32]) {
-    Matter.Composite.remove(this.matterEngine.world,
-                            this.currentRope);
-    Matter.Composite.remove(this.matterEngine.world,
-                            this.currentRopeConstraintAnchor);
-    Matter.Composite.remove(this.matterEngine.world,
-                            this.currentRopeConstraintBall);
-    this.anchorPoint = undefined;
-  }
-
+  this.player1.update();
+  this.player2.update();
   Matter.Engine.update(this.matterEngine);
 };
