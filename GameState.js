@@ -7,32 +7,29 @@ GameState.prototype.init = function() {
   this.camera = new THREE.Camera();
   this.camera = new THREE.PerspectiveCamera(25, 16 / 9, 1, 1000); 
   this.camera.position.z = 200;
+  this.camera.rotation.z = Math.PI;
   this.ball = new THREE.Mesh(
       new THREE.SphereGeometry(2, 0.1, 0.1),
       new THREE.MeshBasicMaterial({color: 0xff0000}));
   this.scene.add(this.ball);
 
   this.matterEngine = Matter.Engine.create();
+  this.matterEngine.world.gravity.scale = .0005;
 
   /* density: weight of the ball
    * frictionAir: the amount of friction in the air, I think. The bigger the number, the more friction */
 
   this.physicsBall = Matter.Bodies.circle(0, 0, 1, { density: 0.04, frictionAir: 0.005});
 
-  /* move this anchorPoint around to get a bigger or smaller radius to rotate around */
-  this.anchorPoint = {x: 5, y: 5};
-  this.currentConstraint = Matter.Constraint.create({
-    pointA: this.anchorPoint,
-    bodyB: this.physicsBall,
-  });
+  this.anchorPoint = undefined;
+  this.currentConstraint = undefined;
   Matter.World.add(this.matterEngine.world, this.physicsBall);
-  Matter.World.add(this.matterEngine.world, this.currentConstraint);
 
   const anchorPrototype = new THREE.Mesh(
       new THREE.SphereGeometry(2, 0.1, 0.1),
       new THREE.MeshBasicMaterial({color: 0x0000ff}));
   this.anchors = [];
-  for(let i = 0; i < 4; i++) {
+  for(let i = 0; i < 10; i++) {
     const anchor = anchorPrototype.clone();
     anchor.position.x = (Math.random() - 0.5) * 160;
     anchor.position.y = (Math.random() - 0.5) * 90;
@@ -51,7 +48,7 @@ GameState.prototype.resume = function() {
 
 GameState.prototype.render = function(renderer) {
   this.ball.position.x = this.physicsBall.position.x;
-  this.ball.position.y = -this.physicsBall.position.y;
+  this.ball.position.y = this.physicsBall.position.y;
   this.ball.rotation.z = this.physicsBall.angle;
   renderer.render(this.scene, this.camera);
 };
@@ -59,7 +56,7 @@ GameState.prototype.render = function(renderer) {
 GameState.prototype.update = function() {
   if(this.anchorPoint) {
     /* forceMultiplier: the bigger this is, the more force we apply to the ball when we push the arrow keys */
-    const forceMultiplier = 0.0006;
+    const forceMultiplier = 0.00005;
     const p1 = this.anchorPoint;
     const p2 = this.physicsBall.position;
     const rotated = Matter.Vector.rotate({x: p2.x - p1.x, y: p2.y - p1.y}, Math.PI / 2);
@@ -74,14 +71,16 @@ GameState.prototype.update = function() {
     }
   } else {
     for(let anchor of this.anchors) {
-      const distanceSquared = Matter.Vector.sub(this.physicsBall.position, anchor.position).magnitudeSquared;
+      const distanceSquared = Matter.Vector.magnitudeSquared(Matter.Vector.sub(this.physicsBall.position, anchor.position));
       console.log(distanceSquared);
-      if(distanceSquared < 10) {
+      if(distanceSquared < 100) {
         this.anchorPoint = anchor.position;
         this.currentConstraint = Matter.Constraint.create({
           pointA: this.anchorPoint,
           bodyB: this.physicsBall,
         });
+        Matter.World.add(this.matterEngine.world, this.currentConstraint);
+        break;
       }
     }
   }
