@@ -15,11 +15,25 @@ GameState.prototype.init = function() {
   this.matterEngine = Matter.Engine.create();
   this.physicsBall = Matter.Bodies.circle(0, 0, 1, { density: 0.04, frictionAir: 0.005});
   this.anchorPoint = {x: 5, y: 5};
+  this.currentConstraint = Matter.Constraint.create({
+    pointA: this.anchorPoint,
+    bodyB: this.physicsBall,
+  });
   Matter.World.add(this.matterEngine.world, this.physicsBall);
-  Matter.World.add(this.matterEngine.world, Matter.Constraint.create({
-            pointA: this.anchorPoint,
-            bodyB: this.physicsBall
-                  }));
+  Matter.World.add(this.matterEngine.world, this.currentConstraint);
+
+  const anchorPrototype = new THREE.Mesh(
+      new THREE.SphereGeometry(2, 0.1, 0.1),
+      new THREE.MeshBasicMaterial({color: 0x0000ff}));
+  this.anchors = [];
+  for(let i = 0; i < 4; i++) {
+    const anchor = anchorPrototype.clone();
+    anchor.position.x = (Math.random() - 0.5) * 160;
+    anchor.position.y = (Math.random() - 0.5) * 90;
+    anchor.material = new THREE.MeshBasicMaterial({color: 0x0000ff});
+    this.scene.add(anchor);
+  }
+
 };
 
 GameState.prototype.pause = function() {
@@ -36,18 +50,47 @@ GameState.prototype.render = function(renderer) {
 };
 
 GameState.prototype.update = function() {
-  const forceMultiplier = 0.0006;
-  const p1 = this.anchorPoint;
-  const p2 = this.physicsBall.position;
-  const rotated = Matter.Vector.rotate({x: p2.x - p1.x, y: p2.y - p1.y}, Math.PI / 2);
-  const normalised = Matter.Vector.normalise(rotated);
-  if(KEYS[37]) {
-    const force = Matter.Vector.mult(normalised, -forceMultiplier);
-    Matter.Body.applyForce(this.physicsBall, this.physicsBall.position, force);
+  if(this.anchorPoint) {
+    const forceMultiplier = 0.0006;
+    const p1 = this.anchorPoint;
+    const p2 = this.physicsBall.position;
+    const rotated = Matter.Vector.rotate({x: p2.x - p1.x, y: p2.y - p1.y}, Math.PI / 2);
+    const normalised = Matter.Vector.normalise(rotated);
+    if(KEYS[37]) {
+      const force = Matter.Vector.mult(normalised, -forceMultiplier);
+      Matter.Body.applyForce(this.physicsBall, this.physicsBall.position, force);
+    }
+    if(KEYS[39]) {
+      const force = Matter.Vector.mult(normalised, forceMultiplier);
+      Matter.Body.applyForce(this.physicsBall, this.physicsBall.position, force);
+    }
+  } else {
+    for(let anchor of this.anchors) {
+      const distanceSquared = Matter.Vector.sub(this.physicsBall.position, anchor.position).magnitudeSquared;
+      if(distanceSquared < 100) {
+        this.anchorPoint = anchor.position;
+        this.currentConstraint = Matter.Constraint.create({
+          pointA: this.anchorPoint,
+          bodyB: this.physicsBall,
+        });
+      }
+    }
   }
-  if(KEYS[39]) {
-    const force = Matter.Vector.mult(normalised, forceMultiplier);
-    Matter.Body.applyForce(this.physicsBall, this.physicsBall.position, force);
+
+  for(let anchor of this.anchors) {
+    if(anchor.position == this.anchorPoint) {
+      anchor.material.color.setRGB(0, 255, 0);
+    } else {
+      anchor.material.color.setRGB(0, 0, 255);
+    }
+  }
+
+  if(KEYS[32]) {
+    Matter.Composite.remove(this.matterEngine.world, this.currentConstraint);
+    this.anchorPoint = undefined;
+    /*
+    this.currentConstraint = undefined;
+    */
   }
 
   Matter.Engine.update(this.matterEngine);
