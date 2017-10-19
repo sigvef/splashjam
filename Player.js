@@ -5,13 +5,12 @@ function Player(game, options) {
     new THREE.BoxGeometry(30, 30, 30),
     new THREE.MeshStandardMaterial({
       color: this.options.color,
-      shading: THREE.FlatShading,
+      flatShading: true,
     }));
   this.body = Matter.Bodies.circle(
       0, 0, 10, { density: 0.004, frictionAir: 0.005});
   Matter.Body.setPosition(this.body, this.options.position);
   this.currentAnchor = undefined;
-  this.score = 0;
   this.ropeMesh = new THREE.Mesh(
     new THREE.BoxGeometry(1, 5, 5),
     new THREE.MeshStandardMaterial({
@@ -26,6 +25,7 @@ Player.prototype.render = function() {
 };
 
 Player.prototype.updateScore = function() {
+  /*
   let numCapturedAnchors = 0;
   for(let anchor of this.game.anchors) {
     if (anchor.owner === this) {
@@ -33,6 +33,7 @@ Player.prototype.updateScore = function() {
     }
   }
   this.score += numCapturedAnchors / FPS;
+  */
 };
 
 Player.prototype.updateRope = function() {
@@ -120,6 +121,9 @@ Player.prototype.update = function() {
             anchor.mesh.position));
       if(distanceSquared < 10000) {
         this.currentAnchor = anchor;
+        if(this.currentAnchor.goal) {
+          this.game.score(this.options.id);
+        }
         const angle = Matter.Vector.angle(
             Matter.Vector.sub(
               anchor.body.position,

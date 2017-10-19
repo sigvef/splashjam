@@ -11,7 +11,10 @@ function HUD(game) {
   this.texture.magFilter = THREE.LinearFilter;
   this.plane = new THREE.Mesh(
     new THREE.PlaneGeometry(1600, 900),
-    new THREE.MeshBasicMaterial({map: this.texture})
+    new THREE.MeshBasicMaterial({
+      map: this.texture,
+      transparent: true,
+    })
   );
   this.plane.rotation.x = Math.PI;
   this.game.scene.add(this.plane);
@@ -25,9 +28,9 @@ HUD.prototype.render = function() {
 
   this.ctx.textBaseline = "top";
   this.ctx.textAlign = 'left';
-  this.ctx.fillText(parseInt(this.game.player1.score).toString(), 40, 20);
+  this.ctx.fillText(parseInt(this.game.scores[0]).toString(), 40, 20);
   this.ctx.textAlign = 'right';
-  this.ctx.fillText(parseInt(this.game.player2.score).toString(), 1920 - 40, 20);
+  this.ctx.fillText(parseInt(this.game.scores[1]).toString(), 1920 - 40, 20);
 
   this.texture.needsUpdate = true;
 };

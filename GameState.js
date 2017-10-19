@@ -12,6 +12,7 @@ GameState.prototype.init = function() {
   this.camera.rotation.z = Math.PI;
   this.matterEngine = Matter.Engine.create();
   this.player1 = new Player(this, {
+    id: 0,
     keys: {
       jump: 32,
       up: 38,
@@ -26,6 +27,7 @@ GameState.prototype.init = function() {
     color: 0x223344,
   });
   this.player2 = new Player(this, {
+    id: 1,
     keys: {
       jump: 69,
       up: 87,
@@ -43,6 +45,8 @@ GameState.prototype.init = function() {
   this.scene.add(this.player2.mesh);
   Matter.World.add(this.matterEngine.world, this.player1.body);
   Matter.World.add(this.matterEngine.world, this.player2.body);
+
+  this.scores = [0, 0];
 
   /*
   let render = Matter.Render.create({
@@ -64,7 +68,7 @@ GameState.prototype.init = function() {
       new THREE.SphereGeometry(20, 12, 6),
       new THREE.MeshStandardMaterial({
         color: 0x332244,
-        shading: THREE.FlatShading,
+        flatShading: true,
       }));
   this.anchors = [];
   for(let i = 0; i < 10; i++) {
@@ -83,7 +87,7 @@ GameState.prototype.init = function() {
     }
     anchor.mesh.material = new THREE.MeshStandardMaterial({
       color: 0x332244,
-      shading: THREE.FlatShading,
+      flatShading: true,
     });
     this.anchors.push(anchor);
     this.scene.add(anchor.mesh);
@@ -103,6 +107,11 @@ GameState.prototype.init = function() {
   this.directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
   this.directionalLight2.position.set(-0, -0, -2);
   this.scene.add(this.directionalLight2);
+
+  this.spawnGoal();
+
+  this.goalLight = new THREE.PointLight(0xffff00);
+  this.scene.add(this.goalLight);
 };
 
 GameState.prototype.pause = function() {
@@ -111,7 +120,32 @@ GameState.prototype.pause = function() {
 GameState.prototype.resume = function() {
 };
 
+GameState.prototype.score = function(playerId) {
+  const score = this.scores[playerId] + 1;
+  this.scores[0] = 0;
+  this.scores[1] = 0;
+  this.scores[playerId] = score;
+  this.spawnGoal();
+};
+
+GameState.prototype.spawnGoal = function() {
+  for(let anchor of this.anchors) {
+    anchor.goal = false;
+  }
+  let index = 2 + Math.random() * (this.anchors.length - 2) | 0;
+  const anchor = this.anchors[index];
+  anchor.goal = true;
+};
+
 GameState.prototype.render = function(renderer) {
+  for(let anchor of this.anchors) {
+    if(anchor.goal) {
+      anchor.mesh.material.color.setRGB(0.5, 0.5, 0.1);
+      this.goalLight.position.copy(anchor.mesh.position);
+    } else {
+      anchor.mesh.material.color.setRGB(0.1, 0.0, 0.1);
+    }
+  }
   this.player1.render();
   this.player2.render();
   this.hud.render();
