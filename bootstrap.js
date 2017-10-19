@@ -112,7 +112,7 @@ function resize(e) {
   } else {
     GU = (window.innerWidth / 16);
   }
-  renderer.setSize(16 * GU, 9 * GU);
+  renderer.setSize(16 * GU / 2, 9 * GU / 2);
   canvas.style.margin = ((window.innerHeight - 9 * GU) / 2) + "px 0 0 " + ((window.innerWidth - 16 * GU) / 2) + "px";
 };
 
