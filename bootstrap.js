@@ -5,16 +5,19 @@ CENTER = {
   y: 4.5
 };
 
+FPS = 60;
+
 missedGFXFrames = 0;
 
 /* smoothstep interpolates between a and b, at time t from 0 to 1 */
 function smoothstep(a, b, t) {
   var v = t * t * (3 - 2 * t);
   return b * v + a * (1 - v);
-};
+}
+
 function clamp(low, x, high) {
   return Math.max(low, Math.min(x, high));
-};
+}
 
 function loadImage(path) {
   var img = new Image();
@@ -24,7 +27,7 @@ function loadImage(path) {
   };
   img.src = path;
   return img;
-};
+}
 
 window.requestAnimFrame = (function() {
   return  window.requestAnimationFrame ||
@@ -60,7 +63,7 @@ function loop() {
 
 
   requestAnimFrame(loop);
-};
+}
 
 function bootstrap() {
 
@@ -104,7 +107,7 @@ function bootstrap() {
 
   loaded--;
   requestAnimFrame(loop);
-};
+}
 
 function resize(e) {
   if (window.innerWidth / window.innerHeight > 16 / 9) {
@@ -114,7 +117,7 @@ function resize(e) {
   }
   renderer.setSize(16 * GU / 2, 9 * GU / 2);
   canvas.style.margin = ((window.innerHeight - 9 * GU) / 2) + "px 0 0 " + ((window.innerWidth - 16 * GU) / 2) + "px";
-};
+}
 
 window.onresize = resize;
 
@@ -124,7 +127,7 @@ function contains(obj) {
     obj.position.x + obj.size.w > this.position.x &&
     obj.position.y < this.position.y + this.size.h &&
     obj.position.y + obj.size.h > this.position.y;
-};
+}
 
 // Array Remove - By John Resig (MIT Licensed)
 Array.remove = function(array, from, to) {

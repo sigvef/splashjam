@@ -1,6 +1,6 @@
 // Copy this file, rename to name of state and add to StateManager
 function GameState() {
-};
+}
 
 GameState.prototype.init = function() {
 
@@ -43,7 +43,7 @@ GameState.prototype.init = function() {
   this.scene.add(this.player2.mesh);
   Matter.World.add(this.matterEngine.world, this.player1.body);
   Matter.World.add(this.matterEngine.world, this.player2.body);
-  var render = Matter.Render.create({
+  let render = Matter.Render.create({
         element: document.body,
         engine: this.matterEngine,
         options: {
@@ -84,6 +84,8 @@ GameState.prototype.init = function() {
     anchor.owner = 'neutral';
     Matter.World.add(this.matterEngine.world, anchor.body);
   }
+
+  this.hud = new HUD(this);
 };
 
 GameState.prototype.pause = function() {
@@ -104,6 +106,7 @@ GameState.prototype.render = function(renderer) {
       anchor.material.color.setRGB(255, 0, 255);
     }
   }
+  this.hud.render();
   renderer.render(this.scene, this.camera);
 };
 
@@ -111,4 +114,5 @@ GameState.prototype.update = function() {
   this.player1.update();
   this.player2.update();
   Matter.Engine.update(this.matterEngine);
+  this.hud.update();
 };
