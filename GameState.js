@@ -13,7 +13,13 @@ GameState.prototype.init = function() {
   this.scene.add(this.ball);
 
   this.matterEngine = Matter.Engine.create();
+
+  /* density: weight of the ball
+   * frictionAir: the amount of friction in the air, I think. The bigger the number, the more friction */
+
   this.physicsBall = Matter.Bodies.circle(0, 0, 1, { density: 0.04, frictionAir: 0.005});
+
+  /* move this anchorPoint around to get a bigger or smaller radius to rotate around */
   this.anchorPoint = {x: 5, y: 5};
   this.currentConstraint = Matter.Constraint.create({
     pointA: this.anchorPoint,
@@ -31,6 +37,7 @@ GameState.prototype.init = function() {
     anchor.position.x = (Math.random() - 0.5) * 160;
     anchor.position.y = (Math.random() - 0.5) * 90;
     anchor.material = new THREE.MeshBasicMaterial({color: 0x0000ff});
+    this.anchors.push(anchor);
     this.scene.add(anchor);
   }
 
@@ -51,6 +58,7 @@ GameState.prototype.render = function(renderer) {
 
 GameState.prototype.update = function() {
   if(this.anchorPoint) {
+    /* forceMultiplier: the bigger this is, the more force we apply to the ball when we push the arrow keys */
     const forceMultiplier = 0.0006;
     const p1 = this.anchorPoint;
     const p2 = this.physicsBall.position;
@@ -67,7 +75,8 @@ GameState.prototype.update = function() {
   } else {
     for(let anchor of this.anchors) {
       const distanceSquared = Matter.Vector.sub(this.physicsBall.position, anchor.position).magnitudeSquared;
-      if(distanceSquared < 100) {
+      console.log(distanceSquared);
+      if(distanceSquared < 10) {
         this.anchorPoint = anchor.position;
         this.currentConstraint = Matter.Constraint.create({
           pointA: this.anchorPoint,
