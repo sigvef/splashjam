@@ -23,7 +23,7 @@ Player.prototype.update = function() {
     const p2 = this.body.position;
     const rotated = Matter.Vector.rotate({
       x: p2.x - p1.x,
-      y: p2.y - p1.y
+      y: p2.y - p1.y,
     }, Math.PI / 2);
     const normalised = Matter.Vector.normalise(rotated);
     if(KEYS[this.options.keys.left]) {

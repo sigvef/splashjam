@@ -63,8 +63,16 @@ GameState.prototype.init = function() {
   this.anchors = [];
   for(let i = 0; i < 10; i++) {
     const anchor = anchorPrototype.clone();
-    anchor.position.x = (Math.random() - 0.5) * 1600;
-    anchor.position.y = (Math.random() - 0.5) * 900;
+    if(i == 0) {
+      anchor.position.x = this.player1.body.position.x + 50;
+      anchor.position.y = this.player1.body.position.y + 200;
+    } else if(i == 1) {
+      anchor.position.x = this.player2.body.position.x - 50;
+      anchor.position.y = this.player2.body.position.y + 200;
+    } else {
+      anchor.position.x = (Math.random() - 0.5) * 1600;
+      anchor.position.y = (Math.random() - 0.5) * 900;
+    }
     anchor.material = new THREE.MeshBasicMaterial({color: 0x0000ff});
     this.anchors.push(anchor);
     this.scene.add(anchor);
@@ -76,7 +84,6 @@ GameState.prototype.init = function() {
     anchor.owner = 'neutral';
     Matter.World.add(this.matterEngine.world, anchor.body);
   }
-
 };
 
 GameState.prototype.pause = function() {
