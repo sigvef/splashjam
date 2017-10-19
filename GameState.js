@@ -7,6 +7,7 @@ GameState.prototype.init = function() {
   this.scene = new THREE.Scene();
   this.camera = new THREE.Camera();
   this.camera = new THREE.PerspectiveCamera(25, 16 / 9, 1, 10000); 
+  this.cameraTarget = new THREE.Vector3(0, 0, -2500);
   this.camera.position.z = -2500;
   this.camera.rotation.y = Math.PI;
   this.camera.rotation.z = Math.PI;
@@ -155,6 +156,17 @@ GameState.prototype.render = function(renderer) {
 GameState.prototype.update = function() {
   this.player1.update();
   this.player2.update();
+
+  const cameraCenter = Matter.Vector.mult(Matter.Vector.add(this.player1.body.position, this.player2.body.position), .5);
+  const size = Matter.Vector.magnitude(Matter.Vector.sub(this.player1.body.position, this.player2.body.position));
+  this.cameraTarget.x = cameraCenter.x;
+  this.cameraTarget.y = cameraCenter.y;
+  this.cameraTarget.z = -2000 -size / 2;
+  this.camera.position.x = this.camera.position.x - (this.camera.position.x - this.cameraTarget.x) / 64;
+  this.camera.position.y = this.camera.position.y - (this.camera.position.y - this.cameraTarget.y) / 64;
+  this.camera.position.z = this.camera.position.z - (this.camera.position.z - this.cameraTarget.z) / 128;
+  //this.camera.lookAt(cameraCenter.x, cameraCenter.y, 0);
+
   for(let anchor of this.anchors) {
     anchor.mesh.rotation.y += 0.01;
   }
