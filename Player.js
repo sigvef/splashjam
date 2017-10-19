@@ -8,6 +8,7 @@ function Player(game, options) {
       0, 0, 10, { density: 0.004, frictionAir: 0.005});
   Matter.Body.setPosition(this.body, this.options.position);
   this.currentAnchor = undefined;
+  this.score = 0;
 }
 
 Player.prototype.render = function() {
@@ -16,8 +17,18 @@ Player.prototype.render = function() {
   this.mesh.rotation.z = this.body.angle;
 };
 
+Player.prototype.updateScore = function() {
+  let numCapturedAnchors = 0;
+  for(let anchor of this.game.anchors) {
+    if (anchor.owner === this) {
+      numCapturedAnchors++;
+    }
+  }
+  this.score += numCapturedAnchors / FPS;
+};
+
 Player.prototype.update = function() {
-  if(this.currentAnchor) {
+  if (this.currentAnchor) {
     const forceMultiplier = 0.00005;
     const p1 = this.currentAnchor.position;
     const p2 = this.body.position;
@@ -112,18 +123,19 @@ Player.prototype.update = function() {
           length: 0,
         });
         Matter.Composite.add(this.game.matterEngine.world,
-                             this.currentRopeConstraintBall)
+                             this.currentRopeConstraintBall);
         break;
       }
     }
-    }
-    if(KEYS[this.options.keys.jump]) {
-      Matter.Composite.remove(this.game.matterEngine.world,
-                              this.currentRope);
-      Matter.Composite.remove(this.game.matterEngine.world,
-                              this.currentRopeConstraintAnchor);
-      Matter.Composite.remove(this.game.matterEngine.world,
-                              this.currentRopeConstraintBall);
-      this.currentAnchor = undefined;
   }
+  if (KEYS[this.options.keys.jump]) {
+    Matter.Composite.remove(this.game.matterEngine.world,
+                            this.currentRope);
+    Matter.Composite.remove(this.game.matterEngine.world,
+                            this.currentRopeConstraintAnchor);
+    Matter.Composite.remove(this.game.matterEngine.world,
+                            this.currentRopeConstraintBall);
+    this.currentAnchor = undefined;
+  }
+  this.updateScore();
 };
