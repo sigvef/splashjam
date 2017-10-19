@@ -68,26 +68,28 @@ GameState.prototype.init = function() {
       }));
   this.anchors = [];
   for(let i = 0; i < 10; i++) {
-    const anchor = anchorPrototype.clone();
+    const anchor = {
+      mesh: anchorPrototype.clone()
+    };
     if(i == 0) {
-      anchor.position.x = this.player1.body.position.x + 50;
-      anchor.position.y = this.player1.body.position.y + 200;
+      anchor.mesh.position.x = this.player1.body.position.x + 50;
+      anchor.mesh.position.y = this.player1.body.position.y + 200;
     } else if(i == 1) {
-      anchor.position.x = this.player2.body.position.x - 50;
-      anchor.position.y = this.player2.body.position.y + 200;
+      anchor.mesh.position.x = this.player2.body.position.x - 50;
+      anchor.mesh.position.y = this.player2.body.position.y + 200;
     } else {
-      anchor.position.x = (Math.random() - 0.5) * 1600;
-      anchor.position.y = (Math.random() - 0.5) * 900;
+      anchor.mesh.position.x = (Math.random() - 0.5) * 1600;
+      anchor.mesh.position.y = (Math.random() - 0.5) * 900;
     }
-    anchor.material = new THREE.MeshStandardMaterial({
+    anchor.mesh.material = new THREE.MeshStandardMaterial({
       color: 0x332244,
       shading: THREE.FlatShading,
     });
     this.anchors.push(anchor);
-    this.scene.add(anchor);
+    this.scene.add(anchor.mesh);
     anchor.body = Matter.Bodies.circle(
-      anchor.position.x,
-      anchor.position.y,
+      anchor.mesh.position.x,
+      anchor.mesh.position.y,
       10,
       {isStatic: true});
     anchor.owner = 'neutral';
@@ -120,7 +122,7 @@ GameState.prototype.update = function() {
   this.player1.update();
   this.player2.update();
   for(let anchor of this.anchors) {
-    anchor.rotation.y += 0.01;
+    anchor.mesh.rotation.y += 0.01;
   }
   Matter.Engine.update(this.matterEngine);
   this.hud.update();

@@ -38,11 +38,11 @@ Player.prototype.updateScore = function() {
 Player.prototype.updateRope = function() {
   const angle = Matter.Vector.angle(
       Matter.Vector.sub(
-        this.currentAnchor.position,
+        this.currentAnchor.body.position,
         this.body.position),
       {x: 1, y: 0});
   const midpoint = Matter.Vector.mult(
-    Matter.Vector.sub(this.currentAnchor.position,
+    Matter.Vector.sub(this.currentAnchor.body.position,
                       this.body.position),
     0.5);
   const ropePosition = Matter.Vector.add(midpoint, this.body.position);
@@ -58,7 +58,7 @@ Player.prototype.update = function() {
   this.mesh.rotation.y += 0.03;
   if(this.currentAnchor) {
     const forceMultiplier = 0.00005;
-    const p1 = this.currentAnchor.position;
+    const p1 = this.currentAnchor.body.position;
     const p2 = this.body.position;
     const rotated = Matter.Vector.rotate({
       x: p2.x - p1.x,
@@ -92,7 +92,7 @@ Player.prototype.update = function() {
 
     const angle = Matter.Vector.angle(
         Matter.Vector.sub(
-          this.currentAnchor.position,
+          this.currentAnchor.body.position,
           this.body.position),
         {x: 1, y: 0});
     this.grabRotationPrevious = this.grabRotationAmount;
@@ -110,11 +110,14 @@ Player.prototype.update = function() {
     }
     this.updateRope();
   } else {
-    for(let anchor of this.game.anchors) {
+    for(let anchor of [...this.game.anchors, this.game.player1, this.game.player2]) {
+      if(this == anchor) {
+        continue;
+      }
       const distanceSquared = Matter.Vector.magnitudeSquared(
           Matter.Vector.sub(
             this.body.position,
-            anchor.position));
+            anchor.mesh.position));
       if(distanceSquared < 10000) {
         this.currentAnchor = anchor;
         const angle = Matter.Vector.angle(
