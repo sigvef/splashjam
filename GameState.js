@@ -15,6 +15,7 @@ GameState.prototype.init = function() {
       new THREE.MeshBasicMaterial({color: 0xff0000}));
   this.scene.add(this.ball);
   this.ball.position.x = -2000;
+  this.currentAnchor = undefined;
 
   this.matterEngine = Matter.Engine.create();
 
@@ -62,6 +63,7 @@ GameState.prototype.init = function() {
       anchor.position.y,
       10,
       {isStatic: true});
+    anchor.owner = 'neutral';
     Matter.World.add(this.matterEngine.world, anchor.body);
   }
 
@@ -77,6 +79,15 @@ GameState.prototype.render = function(renderer) {
   this.ball.position.x = this.physicsBall.position.x;
   this.ball.position.y = this.physicsBall.position.y;
   this.ball.rotation.z = this.physicsBall.angle;
+  for(let anchor of this.anchors) {
+    anchor.material.color.setRGB(0, 0, 255);
+    if(anchor == this.currentAnchor) {
+      anchor.material.color.setRGB(0, 255, 0);
+    }
+    if(anchor.owner == 'player1') {
+      anchor.material.color.setRGB(0, 255, 255);
+    }
+  }
   renderer.render(this.scene, this.camera);
 };
 
@@ -112,19 +123,39 @@ GameState.prototype.update = function() {
         this.physicsBall.position,
         {x: 0, y: 0.001});
     }
+
+    const angle = Matter.Vector.angle(Matter.Vector.sub(this.anchorPoint, this.physicsBall.position), {x: 1, y: 0});
+    this.grabRotationPrevious = this.grabRotationAmount;
+    let angleDelta = angle - (this.grabRotationPrevious % (Math.PI * 2));
+    if(angleDelta > Math.PI + 0.0000001) {
+      angleDelta -= Math.PI * 2;
+    }
+    if(angleDelta < -Math.PI - 0.00000001) {
+      angleDelta += Math.PI * 2;
+    }
+    this.grabRotationAmount += angleDelta;
+    this.currentAnchor.capturePercentage = Math.abs(this.grabRotationAmount) / Math.PI / 2;
+    console.log(this.currentAnchor.capturePercentage);
+    if(this.currentAnchor.capturePercentage >= 1) {
+      this.currentAnchor.owner = 'player1';
+    }
   } else {
     for(let anchor of this.anchors) {
       const distanceSquared = Matter.Vector.magnitudeSquared(Matter.Vector.sub(this.physicsBall.position, anchor.position));
       if(distanceSquared < 10000) {
-        console.log('mmatch!', distanceSquared);
+        this.currentAnchor = anchor;
         this.anchorPoint = anchor.body.position;
+        const angle = Matter.Vector.angle(Matter.Vector.sub(anchor.body.position, this.physicsBall.position), {x: 1, y: 0});
+        this.grabRotationStart = angle;
+        this.grabRotationPrevious = angle;
+        this.grabRotationAmount = 0;
         var group = Matter.Body.nextGroup(true);
         this.currentRope = Matter.Composites.stack(0, 0, 5, 1, 1, 1, (x, y) => {
           return Matter.Bodies.rectangle(
             x, y, 2, 2, {collisionFilter: {group}});
         });
 
-        Matter.Composites.chain(this.currentRope, 0.5, 0, -0.5, 0, { stiffness: 0.99, length: 1, render: { type: 'line' } });
+        Matter.Composites.chain(this.currentRope, 0.5, 0, -0.5, 0, { stiffness: 0.99999, length: 1, render: { type: 'line' } });
 
         this.currentRopeConstraintAnchor = Matter.Constraint.create({
           bodyA: this.currentRope.bodies[0],
