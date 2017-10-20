@@ -128,7 +128,13 @@ GameState.prototype.pause = function() {
 };
 
 GameState.prototype.resume = function() {
+  composer.passes = [];
   composer.addPass(new POSTPROCESSING.RenderPass(this.scene, this.camera));
+  composer.addPass(new POSTPROCESSING.FilmPass({
+    noiseIntensity: 0.5,
+    scanlineIntensity: 0.05,
+    scanlineDensity: 20,
+  }));
   const pass = new POSTPROCESSING.BloomPass();
   pass.renderToScreen = true;
   composer.addPass(pass);

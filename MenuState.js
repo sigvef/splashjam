@@ -56,6 +56,7 @@ MenuState.prototype.update = function () {
       console.log(obj);
       if(obj.material) {
         const color = obj.material.color;
+        console.log(color);
         obj.material = new THREE.MeshBasicMaterial({
           color: color,
         });
@@ -63,7 +64,6 @@ MenuState.prototype.update = function () {
     });
     this.mesh.add(this.Startmenu_Items);
   }
-  //this.mesh.position.y = Math.sin(+Date() / 1000) * 1000;
   this.camera.rotation.y = Math.PI;
   SoundManager.update();
   if(this.Startmenu_Items) {
@@ -89,5 +89,6 @@ loader.load('res/Startmenu_Items.fbx', object => {
   MenuState.Startmenu_Items = object;
   object.scale.set(10, 10, 10);
   object.rotation.x = Math.PI / 2;
+  object.rotation.z = Math.PI;
 }, () => {console.log('progress')}, () => {console.log('onerror')});
 })();
