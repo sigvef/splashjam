@@ -133,8 +133,9 @@ GameState.prototype.score = function(playerId) {
 GameState.prototype.spawnGoal = function() {
   let nextAnchorCandidates = [];
   for (let i = 2; i < this.anchors.length; i++) {
-    if (!this.anchors[i].goal) {
-      nextAnchorCandidates.push(this.anchors[i]);
+    const anchor = this.anchors[i];
+    if (!anchor.goal && this.player1.currentAnchor !== anchor && this.player2.currentAnchor !== anchor) {
+      nextAnchorCandidates.push(anchor);
     }
   }
   for(let anchor of this.anchors) {
