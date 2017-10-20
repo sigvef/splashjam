@@ -16,9 +16,14 @@ function Player(game, options) {
     new THREE.MeshStandardMaterial({
       color: 0x444444,
     }));
+
+  this.particleSystem = new ParticleSystem(this.game, {
+    color: new THREE.Color(this.options.color),
+  });
 }
 
 Player.prototype.render = function() {
+  this.particleSystem.render();
   this.mesh.position.x = this.body.position.x;
   this.mesh.position.y = this.body.position.y;
   this.mesh.rotation.z = this.body.angle;
@@ -55,6 +60,22 @@ Player.prototype.updateRope = function() {
 };
 
 Player.prototype.update = function() {
+  for(let i = 0; i < Math.pow(this.game.scores[this.options.id], 2); i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const amplitude = Math.random() * .2;
+    const dx = Math.cos(angle) * amplitude;
+    const dy = Math.sin(angle) * amplitude;
+    this.particleSystem.spawn({
+      x: this.body.position.x + dx - this.body.velocity.x * Math.random(),
+      y: this.body.position.y + dy - this.body.velocity.y * Math.random(),
+      z: 0,
+    }, {
+      x: dx,
+      y: dy,
+      z: 0,
+    });
+  }
+  this.particleSystem.update();
   if(KEYS[this.options.keys.respawn]) {
     Matter.Body.setPosition(this.body, this.options.position);
     Matter.Body.setVelocity(this.body, {x: 0, y: 0});
