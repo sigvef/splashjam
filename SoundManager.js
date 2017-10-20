@@ -48,8 +48,12 @@ let SoundManager = (function () {
   }
 
   SoundManager.transitionFromMenuToMain = function() {
-    SoundManager.playMusic('main-loop', -1, 1000, musics['menu-loop'].instance.position);
-    SoundManager.stopMusic('menu-loop', 1000);
+    let offset = 0;
+    if (musics['menu-loop']) {
+      SoundManager.stopMusic('menu-loop', 1000);
+      offset = musics['menu-loop'].instance.position;
+    }
+    SoundManager.playMusic('main-loop', -1, 1000, offset);
   };
 
   /**

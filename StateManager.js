@@ -30,7 +30,7 @@ function StateManager(){
 StateManager.prototype.addState = function(name, state){
   state.init();
   this.states[name] = state;
-}
+};
 
 StateManager.prototype.changeState = function(name, message, transitionEffect, transitionTime){
     this.transitionTime = transitionTime || 0;
