@@ -255,12 +255,12 @@ Player.prototype.disconnectRope = function() {
 var manager = new THREE.LoadingManager();
 const mixers = [];
 const loader = new THREE.FBXLoader( manager );
-loader.load( 'playerBall.fbx', object => {
+loader.load('res/playerBall.fbx', object => {
   Player.outerModel = object;
   object.scale.set(10, 10, 10);
 }, () => {console.log('progress')}, () => {console.log('onerror')});
 
-loader.load( 'PlayerColor.fbx', object => {
+loader.load('res/PlayerColor.fbx', object => {
   Player.innerModel = object;
   object.scale.set(10, 10, 10);
 }, () => {console.log('progress')}, () => {console.log('onerror')});
