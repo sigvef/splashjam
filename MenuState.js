@@ -7,8 +7,6 @@ MenuState.prototype.init = function () {
   this.camera = new THREE.PerspectiveCamera(25, 16 / 9, 1, 100000);
   this.cameraTarget = new THREE.Vector3(0, 0, 2500);
   this.camera.position.z = -15000;
-  //this.camera.rotation.y = Math.PI;
-  //this.camera.rotation.z = Math.PI;
 
   this.canvas = document.createElement('canvas');
   this.ctx = this.canvas.getContext('2d');
@@ -49,17 +47,28 @@ MenuState.prototype.render = function (renderer) {
   renderer.render(this.scene, this.camera);
 };
 
+const menuMaterials = {
+  'CurveSingle.014': new THREE.MeshBasicMaterial({color: 0xBFAD0A}),
+  'CurveSingle.018': new THREE.MeshBasicMaterial({color: 0xBFAD0A}),
+  'CurveSingle.022': new THREE.MeshBasicMaterial({color: 0xBF5B0A}),
+  'CurveSingle.016': new THREE.MeshBasicMaterial({color: 0xBF5B0A}),
+  'CurveSingle.015': new THREE.MeshBasicMaterial({color: 0xA02DD2}),
+  'CurveSingle.020': new THREE.MeshBasicMaterial({color: 0xBFAD0A}),
+  'CurveSingle.017': new THREE.MeshBasicMaterial({color: 0xBF5B0A}),
+  'CurveSingle.021': new THREE.MeshBasicMaterial({color: 0xBF5B0A}),
+  'CurveSingle.013': new THREE.MeshBasicMaterial({color: 0xBF5B0A}),
+  'CurveSingle.023': new THREE.MeshBasicMaterial({color: 0xA02DD2}),
+  'CurveSingle.019': new THREE.MeshBasicMaterial({color: 0xBF5B0A}),
+}
+
 MenuState.prototype.update = function () {
   if(MenuState.Startmenu_Items && !this.Startmenu_Items) {
     this.Startmenu_Items = MenuState.Startmenu_Items.clone();
     this.Startmenu_Items.traverse(obj => {
-      console.log(obj);
       if(obj.material) {
+        console.log(obj.name);
         const color = obj.material.color;
-        console.log(color);
-        obj.material = new THREE.MeshBasicMaterial({
-          color: color,
-        });
+        obj.material = menuMaterials[obj.name] || new THREE.MeshBasicMaterial({color: 0xffffff});
       }
     });
     this.mesh.add(this.Startmenu_Items);
