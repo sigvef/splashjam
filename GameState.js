@@ -27,7 +27,7 @@ GameState.prototype.init = function() {
       respawn: 16,
     },
     position: {
-      x: -600,
+      x: 600,
       y: -100,
     },
     color: 0xf39304,
@@ -43,7 +43,7 @@ GameState.prototype.init = function() {
       respawn: 82,
     },
     position: {
-      x: 600,
+      x: -600,
       y: -100,
     },
     color: 0x0ab9bf,
