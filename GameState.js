@@ -168,6 +168,7 @@ GameState.prototype.render = function(renderer) {
 };
 
 GameState.prototype.update = function() {
+  SoundManager.update();
   this.player1.update();
   this.player2.update();
 
