@@ -15,6 +15,7 @@ GameState.prototype.init = function() {
   this.goalParticleSystem = new ParticleSystem(this, {
     color: new THREE.Color(.2, .2, .2),
   });
+  this.currentGoal = undefined;
 
   this.player1 = new Player(this, {
     id: 0,
@@ -141,6 +142,20 @@ GameState.prototype.resume = function() {
 };
 
 GameState.prototype.score = function(playerId) {
+  for(let i = 0; i < 1000; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const dx = Math.sin(angle);
+    const dy = Math.cos(angle);
+    this.goalParticleSystem.spawn({
+      x: this.currentGoal.body.position.x,
+      y: this.currentGoal.body.position.y,
+      z: 0,
+    }, {
+      x: dx * 10,
+      y: dy * 10,
+      z: (Math.random() - 0.5) * 10,
+    });
+  }
   this.scores[playerId]++;
   this.scores[0] = Math.max(0, this.scores[0]);
   this.scores[1] = Math.max(0, this.scores[1]);
@@ -176,6 +191,7 @@ GameState.prototype.spawnGoal = function() {
   let candidateIndex = Math.random() * nextAnchorCandidates.length | 0;
   const anchor = nextAnchorCandidates[candidateIndex];
   anchor.goal = true;
+  this.currentGoal = anchor;
   if(anchor.GoldenSymbolModel) {
     anchor.GoldenSymbolModel.targetStartPosition.copy(anchor.GoldenSymbolModel.position);
     anchor.GoldenSymbolModel.targetPosition.y = -75;
