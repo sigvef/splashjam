@@ -1,6 +1,7 @@
 function Player(game, options) {
   this.options = options;
   this.game = game;
+  this.spinster = 0;
   this.innerModel = undefined;
   this.outerModel = undefined;
   this.respawnFlag = false;
@@ -194,6 +195,7 @@ Player.prototype.update = function() {
         this.currentAnchor = anchor;
         if(this.currentAnchor.goal) {
           this.game.score(this.options.id);
+          this.spinster = Math.PI * 3;
         }
         const angle = Matter.Vector.angle(
             Matter.Vector.sub(
@@ -237,6 +239,8 @@ Player.prototype.update = function() {
       }
     }
   }
+  this.spinster *= 0.9;
+  this.mesh.rotation.z = this.spinster;
   if(KEYS[this.options.keys.jump]) {
     this.disconnectRope();
   }

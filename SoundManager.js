@@ -3,6 +3,7 @@ Modified version of http://codetuto.com/2014/01/soundwrapper-class-for-soundjs/
  */
 
 let SoundManager = (function () {
+  window.PULSE = 0;
   let musics = {};
   let loaded = false;
   window.MUSICS = musics;
@@ -103,6 +104,7 @@ let SoundManager = (function () {
   SoundManager.update = function () {
     if(MUSICS['main-loop']) {
       let pulse = Math.sin(Math.PI + MUSICS['main-loop'].instance.position / 1000 * Math.PI * 2 / 60 * 130 / 2);
+      window.PULSE = pulse;
       sign = Math.sign(pulse);
       BEATPULSE *= 0.9;
       if(sign != previousSign) {

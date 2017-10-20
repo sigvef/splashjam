@@ -174,7 +174,7 @@ GameState.prototype.render = function(renderer) {
       anchor.Hexagon2Model.material.emissiveIntensityTarget = 0.4;
     }
     if(anchor.goal && anchor.GoldenSymbolModel) {
-      anchor.GoldenSymbolModel.material.emissiveIntensityTarget = 1;
+      anchor.GoldenSymbolModel.material.emissiveIntensityTarget = 3;
     } else if (anchor.GoldenSymbolModel) {
       anchor.GoldenSymbolModel.material.emissiveIntensityTarget = 0;
     }
@@ -308,7 +308,7 @@ GameState.prototype.update = function() {
       }
     }
     if(anchor.GoldenSymbolModel) {
-      //anchor.GoldenSymbolModel.rotation.y =  0.01 * Math.sin(+new Date() /300) * 30;
+      anchor.GoldenSymbolModel.rotation.y =  0.2 * PULSE;
       anchor.GoldenSymbolModel.rotation.x =  0.2 * Math.sin(+new Date() /500);
       anchor.GoldenSymbolModel.rotation.z =  0.2 * Math.cos(+new Date() /500);
     }
