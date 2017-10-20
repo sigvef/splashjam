@@ -124,10 +124,12 @@ GameState.prototype.resume = function() {
 };
 
 GameState.prototype.score = function(playerId) {
-  const score = this.scores[playerId] + 1;
-  this.scores[0] = 0;
-  this.scores[1] = 0;
-  this.scores[playerId] = score;
+  this.scores[0]--;
+  this.scores[1]--;
+  this.scores[playerId]++;
+  this.scores[playerId]++;
+  this.scores[0] = Math.max(0, this.scores[0]);
+  this.scores[1] = Math.max(0, this.scores[1]);
   this.spawnGoal();
 };
 

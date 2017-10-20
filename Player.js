@@ -1,6 +1,7 @@
 function Player(game, options) {
   this.options = options;
   this.game = game;
+  this.respawnFlag = false;
   this.mesh = new THREE.Mesh(
     new THREE.BoxGeometry(30, 30, 30),
     new THREE.MeshStandardMaterial({
@@ -76,12 +77,17 @@ Player.prototype.update = function() {
     });
   }
   this.particleSystem.update();
-  if(KEYS[this.options.keys.respawn]) {
+  if(KEYS[this.options.keys.respawn] && !this.respawnFlag) {
+    this.respawnFlag = true;
     Matter.Body.setPosition(this.body, this.options.position);
     Matter.Body.setVelocity(this.body, {x: 0, y: 0});
     Matter.Body.setAngle(this.body, 0);
     Matter.Body.setAngularVelocity(this.body, 0);
-    this.game.scores[this.options.id] = 0;
+    this.game.scores[this.options.id] = Math.max(0, this.game.scores[this.options.id] - 1);
+    this.disconnectRope();
+  }
+  if(!KEYS[this.options.keys.respawn]) {
+    this.respawnFlag = false;
   }
   this.mesh.rotation.x += 0.05;
   this.mesh.rotation.y += 0.03;
@@ -195,6 +201,12 @@ Player.prototype.update = function() {
     }
   }
   if(KEYS[this.options.keys.jump]) {
+    this.disconnectRope();
+  }
+  this.updateScore();
+};
+
+Player.prototype.disconnectRope = function() {
     Matter.Composite.remove(this.game.matterEngine.world,
                             this.currentRope);
     Matter.Composite.remove(this.game.matterEngine.world,
@@ -203,6 +215,4 @@ Player.prototype.update = function() {
                             this.currentRopeConstraintBall);
     this.currentAnchor = undefined;
     this.game.scene.remove(this.ropeMesh);
-  }
-  this.updateScore();
 };
