@@ -131,6 +131,12 @@ GameState.prototype.score = function(playerId) {
 };
 
 GameState.prototype.spawnGoal = function() {
+  let nextAnchorCandidates = [];
+  for (let i = 2; i < this.anchors.length; i++) {
+    if (!this.anchors[i].goal) {
+      nextAnchorCandidates.push(this.anchors[i]);
+    }
+  }
   for(let anchor of this.anchors) {
     anchor.goal = false;
     if(anchor.GoldenSymbolModel) {
@@ -140,8 +146,9 @@ GameState.prototype.spawnGoal = function() {
       anchor.GoldenSymbolModel.targetPosition.tLength = 200;
     }
   }
-  let index = 2 + Math.random() * (this.anchors.length - 2) | 0;
-  const anchor = this.anchors[index];
+
+  let candidateIndex = Math.random() * nextAnchorCandidates.length | 0;
+  const anchor = nextAnchorCandidates[candidateIndex];
   anchor.goal = true;
   if(anchor.GoldenSymbolModel) {
     anchor.GoldenSymbolModel.targetStartPosition.copy(anchor.GoldenSymbolModel.position);
