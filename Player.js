@@ -91,6 +91,21 @@ Player.prototype.updateRope = function() {
   this.ropeMesh.rotation.z = angle + (Math.random() - 0.5) * 0.2;
 };
 
+Player.prototype.respawn = function() {
+  Matter.Body.setPosition(this.body, this.options.position);
+  Matter.Body.setVelocity(this.body, {x: 0, y: 0});
+  Matter.Body.setAngle(this.body, 0);
+  Matter.Body.setAngularVelocity(this.body, 0);
+  this.game.scores[this.options.id] = Math.max(0, this.game.scores[this.options.id] - 1);
+  this.disconnectRope();
+  for (let player of this.game.players) {
+    if (player.currentAnchor === this) {
+      player.disconnectRope();
+    }
+  }
+  this.playRespawnSound();
+}
+
 Player.prototype.update = function() {
   if(!this.innerModel && Player.innerModel) {
     this.innerModel = Player.innerModel.clone();
@@ -138,18 +153,6 @@ Player.prototype.update = function() {
   this.innerModel.material.emissiveIntensity = BEATPULSE * 2;
   if (KEYS[this.options.keys.respawn] && !this.respawnFlag) {
     this.respawnFlag = true;
-    Matter.Body.setPosition(this.body, this.options.position);
-    Matter.Body.setVelocity(this.body, {x: 0, y: 0});
-    Matter.Body.setAngle(this.body, 0);
-    Matter.Body.setAngularVelocity(this.body, 0);
-    this.game.scores[this.options.id] = Math.max(0, this.game.scores[this.options.id] - 1);
-    this.disconnectRope();
-    for (let player of this.game.players) {
-      if (player.currentAnchor === this) {
-        player.disconnectRope();
-      }
-    }
-    this.playRespawnSound();
   }
   if (!KEYS[this.options.keys.respawn]) {
     this.respawnFlag = false;
@@ -271,6 +274,12 @@ Player.prototype.update = function() {
   this.mesh.rotation.z = this.spinster;
   if(KEYS[this.options.keys.jump]) {
     this.disconnectRope();
+  }
+
+  if(!this.currentAnchor) {
+    if(this.body.position.x < -1600 || this.body.position.x > 1600 || this.body.position.y < -600 || this.body.position.y > 2000) {
+      this.respawn();
+    }
   }
 };
 
