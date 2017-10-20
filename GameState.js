@@ -12,6 +12,7 @@ GameState.prototype.init = function() {
   this.camera.rotation.y = Math.PI;
   this.camera.rotation.z = Math.PI;
   this.matterEngine = Matter.Engine.create();
+
   this.player1 = new Player(this, {
     id: 0,
     keys: {
@@ -26,7 +27,7 @@ GameState.prototype.init = function() {
       x: -600,
       y: -100,
     },
-    color: 0x223344,
+    color: 0xf39304,
   });
   this.player2 = new Player(this, {
     id: 1,
@@ -42,10 +43,8 @@ GameState.prototype.init = function() {
       x: 600,
       y: -100,
     },
-    color: 0x443322,
+    color: 0x0ab9bf,
   });
-  this.scene.add(this.player1.mesh);
-  this.scene.add(this.player2.mesh);
   Matter.World.add(this.matterEngine.world, this.player1.body);
   Matter.World.add(this.matterEngine.world, this.player2.body);
 
@@ -122,12 +121,7 @@ GameState.prototype.pause = function() {
 
 GameState.prototype.resume = function() {
   composer.addPass(new POSTPROCESSING.RenderPass(this.scene, this.camera));
-  const pass = new POSTPROCESSING.BokehPass(this.camera, {
-    focus: 0.2,
-    dof: .2,
-    aperture: 0.025,
-    maxBlur: 1,
-  });
+  const pass = new POSTPROCESSING.BloomPass();
   pass.renderToScreen = true;
   composer.addPass(pass);
 };
@@ -164,13 +158,18 @@ GameState.prototype.render = function(renderer) {
   this.player2.render();
   this.hud.render();
   //renderer.render(this.scene, this.camera);
-  composer.render(1000/60);
+  composer.render(1/60);
 };
 
 GameState.prototype.update = function() {
   SoundManager.update();
   this.player1.update();
   this.player2.update();
+  if(this.objyo) {
+    this.objyo.rotation.x += 0.01;
+    this.objyo.rotation.y += 0.02;
+    this.objyo.rotation.z += 0.03;
+  }
 
   const cameraCenter = Matter.Vector.mult(Matter.Vector.add(this.player1.body.position, this.player2.body.position), .5);
   const size = Matter.Vector.magnitude(Matter.Vector.sub(this.player1.body.position, this.player2.body.position));

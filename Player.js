@@ -1,14 +1,10 @@
 function Player(game, options) {
   this.options = options;
   this.game = game;
+  this.innerModel = undefined;
+  this.outerModel = undefined;
   this.respawnFlag = false;
   this.lightningMaterial = makeLightningMaterial();
-  this.mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(30, 30, 30),
-    new THREE.MeshStandardMaterial({
-      color: this.options.color,
-      flatShading: true,
-    }));
   this.body = Matter.Bodies.circle(
       0, 0, 10, { density: 0.004, frictionAir: 0.005});
   Matter.Body.setPosition(this.body, this.options.position);
@@ -16,6 +12,10 @@ function Player(game, options) {
   this.ropeMesh = new THREE.Mesh(
     new THREE.BoxGeometry(1, 100, 0.001),
     this.lightningMaterial);
+
+  this.mesh = new THREE.Object3D();
+  this.mesh.rotation.x = Math.PI / 2;
+  this.game.scene.add(this.mesh);
 
   const color = new THREE.Color(this.options.color);
   this.lightningMaterial.uniforms.r.value = color.r;
@@ -25,13 +25,17 @@ function Player(game, options) {
   this.particleSystem = new ParticleSystem(this.game, {
     color: new THREE.Color(this.options.color),
   });
+
+  this.pointLight = new THREE.PointLight(this.options.color);
+  this.game.scene.add(this.pointLight);
 }
 
 Player.prototype.render = function() {
   this.particleSystem.render();
   this.mesh.position.x = this.body.position.x;
   this.mesh.position.y = this.body.position.y;
-  this.mesh.rotation.z = this.body.angle;
+  this.mesh.rotation.y = this.body.angle;
+  this.pointLight.position.copy(this.mesh.position);
 };
 
 Player.prototype.updateScore = function() {
@@ -68,6 +72,32 @@ Player.prototype.updateRope = function() {
 };
 
 Player.prototype.update = function() {
+  if(!this.innerModel && Player.innerModel) {
+    this.innerModel = Player.innerModel.clone();
+    this.innerModel.traverse(obj => {
+      if(obj.material) {
+        const color = obj.material.color;
+        obj.material = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(this.options.color),
+          emissive: new THREE.Color(this.options.color),
+          emissiveIntensity: 1,
+        });
+      }
+    });
+    this.mesh.add(this.innerModel);
+  }
+  if(!this.outerModel && Player.outerModel) {
+    this.outerModel = Player.outerModel.clone();
+    this.outerModel.traverse(obj => {
+      if(obj.material) {
+        const color = obj.material.color;
+        obj.material = new THREE.MeshStandardMaterial({
+          color: color,
+        });
+      }
+    });
+    this.mesh.add(this.outerModel);
+  }
   for(let i = 0; i < Math.pow(this.game.scores[this.options.id], 2); i++) {
     const angle = Math.random() * Math.PI * 2;
     const amplitude = Math.random() * .2;
@@ -96,8 +126,6 @@ Player.prototype.update = function() {
   if(!KEYS[this.options.keys.respawn]) {
     this.respawnFlag = false;
   }
-  this.mesh.rotation.x += 0.05;
-  this.mesh.rotation.y += 0.03;
   if(this.currentAnchor) {
     const forceMultiplier = 0.00005;
     const p1 = this.currentAnchor.body.position;
@@ -159,7 +187,7 @@ Player.prototype.update = function() {
       const distanceSquared = Matter.Vector.magnitudeSquared(
           Matter.Vector.sub(
             this.body.position,
-            anchor.mesh.position));
+            anchor.body.position));
       if(distanceSquared < 10000) {
         this.currentAnchor = anchor;
         if(this.currentAnchor.goal) {
@@ -223,3 +251,16 @@ Player.prototype.disconnectRope = function() {
     this.currentAnchor = undefined;
     this.game.scene.remove(this.ropeMesh);
 };
+
+var manager = new THREE.LoadingManager();
+const mixers = [];
+const loader = new THREE.FBXLoader( manager );
+loader.load( 'playerBall.fbx', object => {
+  Player.outerModel = object;
+  object.scale.set(10, 10, 10);
+}, () => {console.log('progress')}, () => {console.log('onerror')});
+
+loader.load( 'PlayerColor.fbx', object => {
+  Player.innerModel = object;
+  object.scale.set(10, 10, 10);
+}, () => {console.log('progress')}, () => {console.log('onerror')});

@@ -11,7 +11,6 @@ function makeLightningMaterial() {
     vertexShader: lightningMaterialVertexShader,
     fragmentShader: lightningMaterialFragmentShader,
     transparent: true,
-    blending: THREE.AdditiveBlending,
   });
   return material;
 }
@@ -134,19 +133,19 @@ void main() {
   float y = abs(intensity * -t + uv.y);
     
   float g = pow(y, 0.2);
-                          
-  vec3 col = vec3(1., 1., 1.) * 1.5;
-  col = col * -g + col;                    
-  col = col * col;
-  col = col * col;
+
+  float amount = 1.5;
+  amount = amount * -g + amount;                    
+  amount = amount * amount;
+  amount = amount * amount;
 
   float alpha = max(1. - abs(uv.x) / length * 512., 0.);
   alpha *= max(1. - abs(uv.y) * 32. , 0.);
-  alpha *= col.x;
+  alpha *= amount;
+  alpha = min(1., alpha);
+  alpha = max(0., alpha);
 
-  col.r *= r;
-  col.g *= g;
-  col.b *= b;
+  vec3 col = vec3(r, g, b) * amount;
                           
   gl_FragColor= vec4(col, alpha);
 }

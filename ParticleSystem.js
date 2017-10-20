@@ -30,7 +30,6 @@ function ParticleSystem(game, options) {
 }
 
 ParticleSystem.prototype.spawn = function(position, velocity) {
-  return;
   this.index = (this.index + 1) % this.particleGeometry.attributes.size.array.length;
   this.particleGeometry.attributes.position.array[this.index * 3] = position.x;
   this.particleGeometry.attributes.position.array[this.index * 3 + 1] = position.y;
@@ -45,7 +44,6 @@ ParticleSystem.prototype.spawn = function(position, velocity) {
 }
 
 ParticleSystem.prototype.update = function() {
-  return;
   const attributes = this.particleGeometry.attributes;
   for(var i = 0; i < attributes.size.array.length; i++) {
     attributes.size.array[i] *= 0.95;
@@ -57,7 +55,6 @@ ParticleSystem.prototype.update = function() {
 }
 
 ParticleSystem.prototype.render = function() {
-  return;
   this.particleGeometry.attributes.size.needsUpdate = true;
   this.particleGeometry.attributes.position.needsUpdate = true;
   this.particleGeometry.attributes.customColor.needsUpdate = true;
