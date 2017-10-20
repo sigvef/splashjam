@@ -69,8 +69,22 @@ GameState.prototype.init = function() {
             max: { x: 800, y: 600 }
                 });
   */
+
+  this.anchorPositions = [
+    {x: -100, y: -380},
+    {x: -450, y: 350},
+    {x: -200, y: -200},
+    {x: -30, y: -0},
+    {x: 30, y: 70},
+    {x: -100, y: 500},
+    {x: -0, y: -420},
+    {x: 200, y: -350},
+    {x: 300, y: 150},
+    {x: 450, y: 300},
+  ];
+
   this.anchors = [];
-  for(let i = 0; i < 10; i++) {
+  for(let i = 0; i < 2 + this.anchorPositions.length; i++) {
     const anchor = {
       mesh: new THREE.Object3D(),
     };
@@ -82,8 +96,8 @@ GameState.prototype.init = function() {
       anchor.mesh.position.x = this.player2.body.position.x - 50;
       anchor.mesh.position.y = this.player2.body.position.y + 200;
     } else {
-      anchor.mesh.position.x = (Math.random() - 0.5) * 1600;
-      anchor.mesh.position.y = (Math.random() - 0.5) * 900;
+      anchor.mesh.position.x = this.anchorPositions[i - 2].x;
+      anchor.mesh.position.y = this.anchorPositions[i - 2].y;
     }
     this.anchors.push(anchor);
     this.scene.add(anchor.mesh);
@@ -121,9 +135,6 @@ GameState.prototype.resume = function() {
 };
 
 GameState.prototype.score = function(playerId) {
-  this.scores[0]--;
-  this.scores[1]--;
-  this.scores[playerId]++;
   this.scores[playerId]++;
   this.scores[0] = Math.max(0, this.scores[0]);
   this.scores[1] = Math.max(0, this.scores[1]);
@@ -153,7 +164,7 @@ GameState.prototype.spawnGoal = function() {
   anchor.goal = true;
   if(anchor.GoldenSymbolModel) {
     anchor.GoldenSymbolModel.targetStartPosition.copy(anchor.GoldenSymbolModel.position);
-    anchor.GoldenSymbolModel.targetPosition.y = -100;
+    anchor.GoldenSymbolModel.targetPosition.y = -75;
     anchor.GoldenSymbolModel.targetPosition.tStart = +new Date();
     anchor.GoldenSymbolModel.targetPosition.tLength = 200;
   }
@@ -249,6 +260,7 @@ GameState.prototype.update = function() {
             color: 0x222222,
             emissive: color,
             emissiveIntensity: 0,
+            flatShading: true,
           });
           anchor.GoldenSymbolModel.material = obj.material;
         }
@@ -296,19 +308,22 @@ GameState.prototype.update = function() {
     }
 
     if(anchor.Hexagon1Model) {
-      anchor.Hexagon1Model.rotation.y += 0.01;
+      //anchor.Hexagon1Model.rotation.y += 0.01;
       if(anchor.goal) {
         anchor.Hexagon1Model.rotation.y += 0.02;
       }
     }
     if(anchor.Hexagon2Model) {
-      anchor.Hexagon2Model.rotation.y -= 0.01;
+      anchor.Hexagon2Model.scale.set(0.0001, 0.0001, 0.0001);
       if(anchor.goal) {
         anchor.Hexagon2Model.rotation.y -= 0.02;
+      anchor.Hexagon2Model.scale.set(17.5, 17.5, 17.5);
       }
     }
     if(anchor.GoldenSymbolModel) {
-      anchor.GoldenSymbolModel.rotation.y =  0.2 * PULSE;
+      if(anchor.goal) {
+        anchor.GoldenSymbolModel.rotation.y =  0.2 * PULSE;
+      }
       anchor.GoldenSymbolModel.rotation.x =  0.2 * Math.sin(+new Date() /500);
       anchor.GoldenSymbolModel.rotation.z =  0.2 * Math.cos(+new Date() /500);
     }
