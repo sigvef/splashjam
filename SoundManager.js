@@ -1,5 +1,5 @@
 /*
-Based on http://codetuto.com/2014/01/soundwrapper-class-for-soundjs/
+Modified version of http://codetuto.com/2014/01/soundwrapper-class-for-soundjs/
  */
 
 let SoundManager = (function () {
@@ -48,8 +48,8 @@ let SoundManager = (function () {
   }
 
   SoundManager.transitionFromMenuToMain = function() {
-    SoundManager.playMusic('main-loop', -1, 3000, musics['menu-loop'].instance.position);
-    SoundManager.stopMusic('menu-loop', 3000);
+    SoundManager.playMusic('main-loop', -1, 1000, musics['menu-loop'].instance.position);
+    SoundManager.stopMusic('menu-loop', 1000);
   };
 
   /**
@@ -99,7 +99,7 @@ let SoundManager = (function () {
           o.fadeProgression -= o.fadeStep;
           if (o.fadeProgression <= 0) {
             o.fadeProgression = 0;
-            SoundManager.stopMusic(id);
+            o.instance.stop();
           } else {
             o.instance.volume = Math.sqrt(o.fadeProgression);
           }
@@ -126,7 +126,7 @@ let SoundManager = (function () {
     }
   };
   /**
-   * Play a sound. Use this only to play a sound effect. If it is music, use CSM.playMusic instead
+   * Play a sound. Use this only to play a sound effect. If it is music, use SoundManager.playMusic instead
    * @param {String} id
    * @returns {void}
    */
