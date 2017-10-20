@@ -5,6 +5,10 @@ Modified version of http://codetuto.com/2014/01/soundwrapper-class-for-soundjs/
 let SoundManager = (function () {
   let musics = {};
   let loaded = false;
+  window.MUSICS = musics;
+  window.BEATPULSE = 0;
+  let sign = 1;
+  let previousSign = 1;
 
   const getTimeAtBeat = (beat, bpm = 130) =>  beat / (bpm / 60);  // in seconds
 
@@ -97,6 +101,15 @@ let SoundManager = (function () {
   };
 
   SoundManager.update = function () {
+    if(MUSICS['main-loop']) {
+      let pulse = Math.sin(Math.PI + MUSICS['main-loop'].instance.position / 1000 * Math.PI * 2 / 60 * 130 / 2);
+      sign = Math.sign(pulse);
+      BEATPULSE *= 0.9;
+      if(sign != previousSign) {
+        BEATPULSE = 1;
+        previousSign = sign;
+      }
+    }
     for (let id in musics) {
       let o = musics[id];
       if (o.playing) {

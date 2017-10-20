@@ -290,9 +290,6 @@ GameState.prototype.update = function() {
 
     if(anchor.GoldenSymbolModel) {
       const step = (+new Date() - anchor.GoldenSymbolModel.targetPosition.tStart) / anchor.GoldenSymbolModel.targetPosition.tLength;
-      if(anchor.goal) {
-        console.log(step, anchor.GoldenSymbolModel.targetStartPosition, anchor.GoldenSymbolModel.targetPosition, anchor.GoldenSymbolModel.position);
-      }
       anchor.GoldenSymbolModel.position.x = smoothstep(anchor.GoldenSymbolModel.targetStartPosition.x, anchor.GoldenSymbolModel.targetPosition.x, step);
       anchor.GoldenSymbolModel.position.y = smoothstep(anchor.GoldenSymbolModel.targetStartPosition.y, anchor.GoldenSymbolModel.targetPosition.y, step);
       anchor.GoldenSymbolModel.position.z = smoothstep(anchor.GoldenSymbolModel.targetStartPosition.z, anchor.GoldenSymbolModel.targetPosition.z, step);

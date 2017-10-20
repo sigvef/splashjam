@@ -78,10 +78,11 @@ Player.prototype.update = function() {
       if(obj.material) {
         const color = obj.material.color;
         obj.material = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(this.options.color),
+          color: 0,
           emissive: new THREE.Color(this.options.color),
           emissiveIntensity: 1,
         });
+        this.innerModel.material = obj.material;
       }
     });
     this.mesh.add(this.innerModel);
@@ -114,6 +115,7 @@ Player.prototype.update = function() {
     });
   }
   this.particleSystem.update();
+  this.innerModel.material.emissiveIntensity = BEATPULSE;
   if(KEYS[this.options.keys.respawn] && !this.respawnFlag) {
     this.respawnFlag = true;
     Matter.Body.setPosition(this.body, this.options.position);
