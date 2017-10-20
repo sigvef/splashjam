@@ -291,20 +291,11 @@ GameState.prototype.update = function() {
   this.player1.update();
   this.player2.update();
 
-  const cameraCenter = Matter.Vector.mult(Matter.Vector.add(this.player1.body.position, this.player2.body.position), .5);
-  const size = Matter.Vector.magnitude(Matter.Vector.sub(this.player1.body.position, this.player2.body.position));
-  this.cameraTarget.x = cameraCenter.x;
-  this.cameraTarget.y = cameraCenter.y;
-  this.cameraTarget.z = -2000 -size / 2;
-
-  this.camera.position.x = this.camera.position.x - (this.camera.position.x - this.cameraTarget.x) / 64;
-  this.camera.position.y = this.camera.position.y - (this.camera.position.y - this.cameraTarget.y) / 64;
-  this.camera.position.z = this.camera.position.z - (this.camera.position.z - this.cameraTarget.z) / 128;
-  //this.camera.lookAt(cameraCenter.x, cameraCenter.y, 0);
-
+  let goalAnchor = null;
   for(let anchor of this.anchors) {
 
     if(anchor.goal) {
+      goalAnchor = anchor;
       const angle = Math.random() * Math.PI * 2;
       const dx = Math.sin(angle) * 20;
       const dy = Math.cos(angle) * 20;
@@ -404,6 +395,28 @@ GameState.prototype.update = function() {
       anchor.GoldenSymbolModel.rotation.z =  0.2 * Math.cos(+new Date() /500);
     }
   }
+
+  // Calculate camera position
+  let positions = [this.player1.body.position, this.player2.body.position];
+  if (goalAnchor) {
+    positions.push(goalAnchor.body.position);
+  }
+  let cameraCenterVector = positions[0];
+  for (let i = 1; i < positions.length; i++) {
+    cameraCenterVector = Matter.Vector.add(cameraCenterVector, positions[i]);
+  }
+  const cameraCenter = Matter.Vector.mult(cameraCenterVector, 1 / positions.length);
+  const size = Matter.Vector.magnitude(
+    Matter.Vector.sub(this.player1.body.position, this.player2.body.position)
+  );
+  this.cameraTarget.x = cameraCenter.x;
+  this.cameraTarget.y = cameraCenter.y;
+  this.cameraTarget.z = -2000 -size / 2;
+  this.camera.position.x = this.camera.position.x - (this.camera.position.x - this.cameraTarget.x) / 64;
+  this.camera.position.y = this.camera.position.y - (this.camera.position.y - this.cameraTarget.y) / 64;
+  this.camera.position.z = this.camera.position.z - (this.camera.position.z - this.cameraTarget.z) / 128;
+  //this.camera.lookAt(cameraCenter.x, cameraCenter.y, 0);
+
   this.goalParticleSystem.update();
   Matter.Engine.update(this.matterEngine);
   this.hud.update();
