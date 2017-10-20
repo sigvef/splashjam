@@ -20,6 +20,7 @@ GameState.prototype.init = function() {
       down: 40,
       left: 37,
       right: 39,
+      respawn: 16,
     },
     position: {
       x: -600,
@@ -35,6 +36,7 @@ GameState.prototype.init = function() {
       down: 83,
       left: 65,
       right: 68,
+      respawn: 82,
     },
     position: {
       x: 600,
@@ -172,4 +174,7 @@ GameState.prototype.update = function() {
   }
   Matter.Engine.update(this.matterEngine);
   this.hud.update();
+  this.hud.plane.position.x = this.camera.position.x;
+  this.hud.plane.position.y = this.camera.position.y;
+  this.hud.plane.position.z = this.camera.position.z + 2500;
 };

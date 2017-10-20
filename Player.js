@@ -55,6 +55,12 @@ Player.prototype.updateRope = function() {
 };
 
 Player.prototype.update = function() {
+  if(KEYS[this.options.keys.respawn]) {
+    Matter.Body.setPosition(this.body, this.options.position);
+    Matter.Body.setVelocity(this.body, {x: 0, y: 0});
+    Matter.Body.setAngle(this.body, 0);
+    Matter.Body.setAngularVelocity(this.body, 0);
+  }
   this.mesh.rotation.x += 0.05;
   this.mesh.rotation.y += 0.03;
   if(this.currentAnchor) {
