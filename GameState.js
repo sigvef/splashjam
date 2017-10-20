@@ -17,38 +17,42 @@ GameState.prototype.init = function() {
   });
   this.currentGoal = undefined;
 
-  this.player1 = new Player(this, {
-    id: 0,
-    keys: {
-      jump: 32,
-      up: 38,
-      down: 40,
-      left: 37,
-      right: 39,
-      respawn: 16,
-    },
-    position: {
-      x: 600,
-      y: -100,
-    },
-    color: 0xf39304,
-  });
-  this.player2 = new Player(this, {
-    id: 1,
-    keys: {
-      jump: 69,
-      up: 87,
-      down: 83,
-      left: 65,
-      right: 68,
-      respawn: 82,
-    },
-    position: {
-      x: -600,
-      y: -100,
-    },
-    color: 0x0ab9bf,
-  });
+  this.players = [
+    new Player(this, {
+      id: 0,
+      keys: {
+        jump: 32,
+        up: 38,
+        down: 40,
+        left: 37,
+        right: 39,
+        respawn: 16,
+      },
+      position: {
+        x: 600,
+        y: -100,
+      },
+      color: 0xf39304,
+    }),
+    new Player(this, {
+      id: 1,
+      keys: {
+        jump: 69,
+        up: 87,
+        down: 83,
+        left: 65,
+        right: 68,
+        respawn: 82,
+      },
+      position: {
+        x: -600,
+        y: -100,
+      },
+      color: 0x0ab9bf,
+    })
+  ];
+  this.player1 = this.players[0];  // deprecated variable, use players[0] instead
+  this.player2 = this.players[1];  // deprecated variable, use players[1] instead
   Matter.World.add(this.matterEngine.world, this.player1.body);
   Matter.World.add(this.matterEngine.world, this.player2.body);
 
@@ -90,10 +94,10 @@ GameState.prototype.init = function() {
       mesh: new THREE.Object3D(),
     };
     anchor.mesh.rotation.x = Math.PI / 2;
-    if(i == 0) {
+    if(i === 0) {
       anchor.mesh.position.x = this.player1.body.position.x + 50;
       anchor.mesh.position.y = this.player1.body.position.y + 200;
-    } else if(i == 1) {
+    } else if(i === 1) {
       anchor.mesh.position.x = this.player2.body.position.x - 50;
       anchor.mesh.position.y = this.player2.body.position.y + 200;
     } else {

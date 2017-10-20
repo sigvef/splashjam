@@ -136,7 +136,7 @@ Player.prototype.update = function() {
   }
   this.particleSystem.update();
   this.innerModel.material.emissiveIntensity = BEATPULSE * 2;
-  if(KEYS[this.options.keys.respawn] && !this.respawnFlag) {
+  if (KEYS[this.options.keys.respawn] && !this.respawnFlag) {
     this.respawnFlag = true;
     Matter.Body.setPosition(this.body, this.options.position);
     Matter.Body.setVelocity(this.body, {x: 0, y: 0});
@@ -144,9 +144,14 @@ Player.prototype.update = function() {
     Matter.Body.setAngularVelocity(this.body, 0);
     this.game.scores[this.options.id] = Math.max(0, this.game.scores[this.options.id] - 1);
     this.disconnectRope();
+    for (let player of this.game.players) {
+      if (player.currentAnchor === this) {
+        player.disconnectRope();
+      }
+    }
     this.playRespawnSound();
   }
-  if(!KEYS[this.options.keys.respawn]) {
+  if (!KEYS[this.options.keys.respawn]) {
     this.respawnFlag = false;
   }
   if(this.currentAnchor) {
