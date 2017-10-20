@@ -4,7 +4,7 @@ Modified version of http://codetuto.com/2014/01/soundwrapper-class-for-soundjs/
 
 let SoundManager = (function () {
   let musics = {};
-  let state = 'menu';
+  let loaded = false;
 
   const getTimeAtBeat = (beat, bpm = 130) =>  beat / (bpm / 60);  // in seconds
 
@@ -33,9 +33,14 @@ let SoundManager = (function () {
       }
     }
   ];
-  createjs.Sound.alternateExtensions = ["mp3"];  // TODO: actually add mp3 variant
+  createjs.Sound.alternateExtensions = ["mp3"];
   createjs.Sound.on("fileload", function() {
-    SoundManager.playMusic("menu-loop", -1, 500);
+    loaded = true;
+    if (sm.activeState === sm.states['menu']) {
+      SoundManager.playMusic("menu-loop", -1, 500);
+    } else {
+      SoundManager.playMusic("main-loop", -1, 500);
+    }
   });
   createjs.Sound.registerSounds(this.sounds, soundPath);
 
@@ -48,12 +53,14 @@ let SoundManager = (function () {
   }
 
   SoundManager.transitionFromMenuToMain = function() {
-    let offset = 0;
-    if (musics['menu-loop']) {
-      SoundManager.stopMusic('menu-loop', 1000);
-      offset = musics['menu-loop'].instance.position;
+    if (loaded) {
+      let offset = 0;
+      if (musics['menu-loop']) {
+        SoundManager.stopMusic('menu-loop', 1000);
+        offset = musics['menu-loop'].instance.position;
+      }
+      SoundManager.playMusic('main-loop', -1, 1000, offset);
     }
-    SoundManager.playMusic('main-loop', -1, 1000, offset);
   };
 
   /**
