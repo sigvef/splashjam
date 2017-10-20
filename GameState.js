@@ -321,17 +321,17 @@ GameState.prototype.update = function() {
 var manager = new THREE.LoadingManager();
 const mixers = [];
 const loader = new THREE.FBXLoader( manager );
-loader.load( 'GoldenSymbol.fbx', object => {
+loader.load( 'res/GoldenSymbol.fbx', object => {
   GameState.GoldenSymbolModel = object;
   object.scale.set(17.5, 17.5, 17.5);
 }, () => {console.log('progress')}, () => {console.log('onerror')});
 
-loader.load( 'Hexagon1.fbx', object => {
+loader.load( 'res/Hexagon1.fbx', object => {
   GameState.Hexagon1Model = object;
   object.scale.set(17.5, 17.5, 17.5);
 }, () => {console.log('progress')}, () => {console.log('onerror')});
 
-loader.load( 'Hexagon2.fbx', object => {
+loader.load( 'res/Hexagon2.fbx', object => {
   GameState.Hexagon2Model = object;
   object.scale.set(17.5, 17.5, 17.5);
 }, () => {console.log('progress')}, () => {console.log('onerror')});
