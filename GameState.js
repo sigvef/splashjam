@@ -163,13 +163,13 @@ GameState.prototype.render = function(renderer) {
   this.goalParticleSystem.render();
   for(let anchor of this.anchors) {
     if(anchor.goal && anchor.Hexagon1Model) {
-      anchor.Hexagon1Model.material.emissiveIntensityTarget = 1;
+      anchor.Hexagon1Model.material.emissiveIntensityTarget = 10;
       this.goalLight.position.copy(anchor.mesh.position);
     } else if (anchor.Hexagon1Model) {
       anchor.Hexagon1Model.material.emissiveIntensityTarget = 0.4;
     }
     if(anchor.goal && anchor.Hexagon2Model) {
-      anchor.Hexagon2Model.material.emissiveIntensityTarget = 1;
+      anchor.Hexagon2Model.material.emissiveIntensityTarget = 10;
     } else if (anchor.Hexagon1Model) {
       anchor.Hexagon2Model.material.emissiveIntensityTarget = 0.4;
     }

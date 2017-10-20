@@ -115,7 +115,7 @@ Player.prototype.update = function() {
     });
   }
   this.particleSystem.update();
-  this.innerModel.material.emissiveIntensity = BEATPULSE;
+  this.innerModel.material.emissiveIntensity = BEATPULSE * 2;
   if(KEYS[this.options.keys.respawn] && !this.respawnFlag) {
     this.respawnFlag = true;
     Matter.Body.setPosition(this.body, this.options.position);
