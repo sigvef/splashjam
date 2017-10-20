@@ -144,7 +144,15 @@ GameState.prototype.score = function(playerId) {
   this.scores[playerId]++;
   this.scores[0] = Math.max(0, this.scores[0]);
   this.scores[1] = Math.max(0, this.scores[1]);
-  this.spawnGoal();
+  if (this.scores[playerId] === 5) {
+    SoundManager.playSound('win');
+    setTimeout(function() {
+      alert(`Player ${playerId} wins`);
+    }, 2000)
+  } else {
+    this.spawnGoal();
+    SoundManager.playSound(`hit${this.scores[playerId]}`);
+  }
 };
 
 GameState.prototype.spawnGoal = function() {

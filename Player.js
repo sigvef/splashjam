@@ -1,4 +1,6 @@
 function Player(game, options) {
+  let that = this;
+
   this.options = options;
   this.game = game;
   this.spinster = 0;
@@ -10,6 +12,7 @@ function Player(game, options) {
       0, 0, 10, { density: 0.004, frictionAir: 0.005});
   Matter.Body.setPosition(this.body, this.options.position);
   this.currentAnchor = undefined;
+  this.lastAnchor = null;
   this.ropeMesh = new THREE.Mesh(
     new THREE.BoxGeometry(1, 100, 0.001),
     this.lightningMaterial);
@@ -29,6 +32,34 @@ function Player(game, options) {
 
   this.pointLight = new THREE.PointLight(this.options.color);
   this.game.scene.add(this.pointLight);
+
+  that.pendingReleaseSound = null;
+  that.respawnSound = null;
+  this.playReleaseSound = function() {
+    if (that.pendingReleaseSound !== null) {
+      clearTimeout(that.pendingReleaseSound);
+    }
+    // debounce the sound, so it doesn't play too often
+    this.pendingReleaseSound = setTimeout(function() {
+      that.releaseSound = SoundManager.playSound('release');
+      that.pendingReleaseSound = null;
+    }, 30);
+  };
+
+  this.playConnectSound = function(isGoal = false) {
+    if (that.pendingReleaseSound) {
+      clearTimeout(that.pendingReleaseSound);
+    } else if (that.releaseSound && that.releaseSound.playState === createjs.Sound.PLAY_SUCCEEDED) {
+      this.releaseSound.stop();  // interrupt playing sound
+    }
+    if (!isGoal && this.lastAnchor !== this.currentAnchor) {
+      SoundManager.playSound('grab');
+    }
+  };
+
+  this.playRespawnSound = function() {
+    SoundManager.playSound('respawn');
+  }.throttle(300, that);
 }
 
 Player.prototype.render = function() {
@@ -37,18 +68,6 @@ Player.prototype.render = function() {
   this.mesh.position.y = this.body.position.y;
   this.mesh.rotation.y = this.body.angle;
   this.pointLight.position.copy(this.mesh.position);
-};
-
-Player.prototype.updateScore = function() {
-  /*
-  let numCapturedAnchors = 0;
-  for(let anchor of this.game.anchors) {
-    if (anchor.owner === this) {
-      numCapturedAnchors++;
-    }
-  }
-  this.score += numCapturedAnchors / FPS;
-  */
 };
 
 Player.prototype.updateRope = function() {
@@ -125,6 +144,7 @@ Player.prototype.update = function() {
     Matter.Body.setAngularVelocity(this.body, 0);
     this.game.scores[this.options.id] = Math.max(0, this.game.scores[this.options.id] - 1);
     this.disconnectRope();
+    this.playRespawnSound();
   }
   if(!KEYS[this.options.keys.respawn]) {
     this.respawnFlag = false;
@@ -191,12 +211,15 @@ Player.prototype.update = function() {
           Matter.Vector.sub(
             this.body.position,
             anchor.body.position));
-      if(distanceSquared < 12000) {
+      if(distanceSquared < 13000) {
         this.currentAnchor = anchor;
+
+        this.playConnectSound(this.currentAnchor.goal);
         if(this.currentAnchor.goal) {
           this.game.score(this.options.id);
           this.spinster = Math.PI * 3;
         }
+        this.lastAnchor = this.currentAnchor;
         const angle = Matter.Vector.angle(
             Matter.Vector.sub(
               anchor.body.position,
@@ -244,7 +267,6 @@ Player.prototype.update = function() {
   if(KEYS[this.options.keys.jump]) {
     this.disconnectRope();
   }
-  this.updateScore();
 };
 
 Player.prototype.disconnectRope = function() {
@@ -259,6 +281,7 @@ Player.prototype.disconnectRope = function() {
                           this.currentRopeConstraintBall);
   this.currentAnchor = undefined;
   this.game.scene.remove(this.ropeMesh);
+  this.playReleaseSound();
 };
 
 var manager = new THREE.LoadingManager();

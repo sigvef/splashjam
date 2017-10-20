@@ -20,19 +20,59 @@ let SoundManager = (function () {
       data: {
         audioSprite: [
           {
-            id: "menu-start",
-            startTime: 0,
-            duration: getTimeAtBeat(32) * 1000
-          },
-          {
             id: "menu-loop",
-            startTime: getTimeAtBeat(32) * 1000,
-            duration: getTimeAtBeat(32) * 1000
+            startTime: getTimeAtBeat(8 * 4) * 1000,
+            duration: getTimeAtBeat(8 * 4) * 1000
           },
           {
             id: "main-loop",
-            startTime: getTimeAtBeat(80) * 1000,
-            duration: (getTimeAtBeat(240) - getTimeAtBeat(80)) * 1000
+            startTime: getTimeAtBeat(20 * 4) * 1000,
+            duration: (getTimeAtBeat(60 * 4) - getTimeAtBeat(20 * 4)) * 1000
+          },
+          {
+            id: "hit1",
+            startTime: getTimeAtBeat(61 * 4) * 1000,
+            duration: getTimeAtBeat(4) * 1000
+          },
+          {
+            id: "hit2",
+            startTime: getTimeAtBeat(62 * 4) * 1000,
+            duration: getTimeAtBeat(4) * 1000
+          },
+          {
+            id: "hit3",
+            startTime: getTimeAtBeat(63 * 4) * 1000,
+            duration: getTimeAtBeat(4) * 1000
+          },
+          {
+            id: "hit4",
+            startTime: getTimeAtBeat(64 * 4) * 1000,
+            duration: getTimeAtBeat(4) * 1000
+          },
+          {
+            id: "hit5",
+            startTime: getTimeAtBeat(65 * 4) * 1000,
+            duration: getTimeAtBeat(4) * 1000
+          },
+          {
+            id: "respawn",
+            startTime: getTimeAtBeat(66 * 4) * 1000,
+            duration: getTimeAtBeat(4) * 1000
+          },
+          {
+            id: "release",
+            startTime: getTimeAtBeat(67 * 4) * 1000,
+            duration: getTimeAtBeat(4) * 1000
+          },
+          {
+            id: "grab",
+            startTime: getTimeAtBeat(68.5 * 4) * 1000,
+            duration: getTimeAtBeat(1) * 1000
+          },
+          {
+            id: "win",
+            startTime: getTimeAtBeat(69 * 4) * 1000,
+            duration: getTimeAtBeat(6) * 1000
           },
         ]
       }
@@ -157,7 +197,7 @@ let SoundManager = (function () {
    * @returns {void}
    */
   SoundManager.playSound = function (id) {
-    createjs.Sound.play(id);
+    return createjs.Sound.play(id);
   };
   /**
    * Stop a sound
