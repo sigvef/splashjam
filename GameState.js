@@ -6,7 +6,7 @@ GameState.prototype.init = function() {
 
   this.scene = new THREE.Scene();
   this.camera = new THREE.Camera();
-  this.camera = new THREE.PerspectiveCamera(25, 16 / 9, 1, 10000); 
+  this.camera = new THREE.PerspectiveCamera(25, 16 / 9, 1, 100000);
   this.cameraTarget = new THREE.Vector3(0, 0, -2500);
   this.camera.position.z = -2500;
   this.camera.rotation.y = Math.PI;
@@ -121,6 +121,15 @@ GameState.prototype.pause = function() {
 };
 
 GameState.prototype.resume = function() {
+  composer.addPass(new POSTPROCESSING.RenderPass(this.scene, this.camera));
+  const pass = new POSTPROCESSING.BokehPass(this.camera, {
+    focus: 0.2,
+    dof: .2,
+    aperture: 0.025,
+    maxBlur: 1,
+  });
+  pass.renderToScreen = true;
+  composer.addPass(pass);
 };
 
 GameState.prototype.score = function(playerId) {
@@ -154,7 +163,8 @@ GameState.prototype.render = function(renderer) {
   this.player1.render();
   this.player2.render();
   this.hud.render();
-  renderer.render(this.scene, this.camera);
+  //renderer.render(this.scene, this.camera);
+  composer.render(1000/60);
 };
 
 GameState.prototype.update = function() {

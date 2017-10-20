@@ -2,6 +2,7 @@ function Player(game, options) {
   this.options = options;
   this.game = game;
   this.respawnFlag = false;
+  this.lightningMaterial = makeLightningMaterial();
   this.mesh = new THREE.Mesh(
     new THREE.BoxGeometry(30, 30, 30),
     new THREE.MeshStandardMaterial({
@@ -13,10 +14,13 @@ function Player(game, options) {
   Matter.Body.setPosition(this.body, this.options.position);
   this.currentAnchor = undefined;
   this.ropeMesh = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 5, 5),
-    new THREE.MeshStandardMaterial({
-      color: 0x444444,
-    }));
+    new THREE.BoxGeometry(1, 100, 0.001),
+    this.lightningMaterial);
+
+  const color = new THREE.Color(this.options.color);
+  this.lightningMaterial.uniforms.r.value = color.r;
+  this.lightningMaterial.uniforms.g.value = color.g;
+  this.lightningMaterial.uniforms.b.value = color.b;
 
   this.particleSystem = new ParticleSystem(this.game, {
     color: new THREE.Color(this.options.color),
@@ -53,11 +57,14 @@ Player.prototype.updateRope = function() {
                       this.body.position),
     0.5);
   const ropePosition = Matter.Vector.add(midpoint, this.body.position);
-  const length = Matter.Vector.magnitude(midpoint);
+  const length = Matter.Vector.magnitude(midpoint) * 1.5;
+  this.lightningMaterial.uniforms.time.value += 1 / 60 * length / 128;
+  this.lightningMaterial.uniforms.intensity.value = 1;
+  this.lightningMaterial.uniforms.length.value = length;
   this.ropeMesh.scale.set(length, 1, 1);
   this.ropeMesh.position.x = ropePosition.x;
   this.ropeMesh.position.y = ropePosition.y;
-  this.ropeMesh.rotation.z = angle;
+  this.ropeMesh.rotation.z = angle + (Math.random() - 0.5) * 0.2;
 };
 
 Player.prototype.update = function() {
