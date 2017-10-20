@@ -136,7 +136,12 @@ GameState.prototype.resume = function() {
     scanlineIntensity: 0.05,
     scanlineDensity: 20,
   }));
-  const pass = new POSTPROCESSING.BloomPass();
+  const pass = new POSTPROCESSING.BloomPass({
+    resolutionScale: 0.5,
+    intensity: 4,
+    distinction: 2,
+  });
+  this.bloompass = pass;
   pass.renderToScreen = true;
   composer.addPass(pass);
 };
@@ -201,6 +206,7 @@ GameState.prototype.spawnGoal = function() {
 };
 
 GameState.prototype.render = function(renderer) {
+  this.bloompass.intensity = 2 + BEATPULSE;
   this.goalParticleSystem.render();
   for(let anchor of this.anchors) {
     if(anchor.goal && anchor.Hexagon1Model) {
