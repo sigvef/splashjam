@@ -9,8 +9,16 @@ FPS = 60;
 
 missedGFXFrames = 0;
 
+
+function clamp(lower, upper, value) {
+  value = Math.min(upper, value);
+  value = Math.max(lower, value);
+  return value;
+}
+
 /* smoothstep interpolates between a and b, at time t from 0 to 1 */
 function smoothstep(a, b, t) {
+  t = clamp(0, 1, t);
   var v = t * t * (3 - 2 * t);
   return b * v + a * (1 - v);
 }

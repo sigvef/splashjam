@@ -242,14 +242,17 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.disconnectRope = function() {
-    Matter.Composite.remove(this.game.matterEngine.world,
-                            this.currentRope);
-    Matter.Composite.remove(this.game.matterEngine.world,
-                            this.currentRopeConstraintAnchor);
-    Matter.Composite.remove(this.game.matterEngine.world,
-                            this.currentRopeConstraintBall);
-    this.currentAnchor = undefined;
-    this.game.scene.remove(this.ropeMesh);
+  if(!this.currentAnchor) {
+    return;
+  }
+  Matter.Composite.remove(this.game.matterEngine.world,
+                          this.currentRope);
+  Matter.Composite.remove(this.game.matterEngine.world,
+                          this.currentRopeConstraintAnchor);
+  Matter.Composite.remove(this.game.matterEngine.world,
+                          this.currentRopeConstraintBall);
+  this.currentAnchor = undefined;
+  this.game.scene.remove(this.ropeMesh);
 };
 
 var manager = new THREE.LoadingManager();

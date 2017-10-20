@@ -12,6 +12,9 @@ GameState.prototype.init = function() {
   this.camera.rotation.y = Math.PI;
   this.camera.rotation.z = Math.PI;
   this.matterEngine = Matter.Engine.create();
+  this.goalParticleSystem = new ParticleSystem(this, {
+    color: new THREE.Color(.2, .2, .2),
+  });
 
   this.player1 = new Player(this, {
     id: 0,
@@ -66,17 +69,12 @@ GameState.prototype.init = function() {
             max: { x: 800, y: 600 }
                 });
   */
-  const anchorPrototype = new THREE.Mesh(
-      new THREE.SphereGeometry(20, 12, 6),
-      new THREE.MeshStandardMaterial({
-        color: 0x332244,
-        flatShading: true,
-      }));
   this.anchors = [];
   for(let i = 0; i < 10; i++) {
     const anchor = {
-      mesh: anchorPrototype.clone()
+      mesh: new THREE.Object3D(),
     };
+    anchor.mesh.rotation.x = Math.PI / 2;
     if(i == 0) {
       anchor.mesh.position.x = this.player1.body.position.x + 50;
       anchor.mesh.position.y = this.player1.body.position.y + 200;
@@ -87,10 +85,6 @@ GameState.prototype.init = function() {
       anchor.mesh.position.x = (Math.random() - 0.5) * 1600;
       anchor.mesh.position.y = (Math.random() - 0.5) * 900;
     }
-    anchor.mesh.material = new THREE.MeshStandardMaterial({
-      color: 0x332244,
-      flatShading: true,
-    });
     this.anchors.push(anchor);
     this.scene.add(anchor.mesh);
     anchor.body = Matter.Bodies.circle(
@@ -139,21 +133,58 @@ GameState.prototype.score = function(playerId) {
 GameState.prototype.spawnGoal = function() {
   for(let anchor of this.anchors) {
     anchor.goal = false;
+    if(anchor.GoldenSymbolModel) {
+      anchor.GoldenSymbolModel.targetStartPosition.copy(anchor.GoldenSymbolModel.position);
+      anchor.GoldenSymbolModel.targetPosition.y = 0;
+      anchor.GoldenSymbolModel.targetPosition.tStart = +new Date();
+      anchor.GoldenSymbolModel.targetPosition.tLength = 200;
+    }
   }
   let index = 2 + Math.random() * (this.anchors.length - 2) | 0;
   const anchor = this.anchors[index];
   anchor.goal = true;
+  if(anchor.GoldenSymbolModel) {
+    anchor.GoldenSymbolModel.targetStartPosition.copy(anchor.GoldenSymbolModel.position);
+    anchor.GoldenSymbolModel.targetPosition.y = -100;
+    anchor.GoldenSymbolModel.targetPosition.tStart = +new Date();
+    anchor.GoldenSymbolModel.targetPosition.tLength = 200;
+  }
 };
 
 GameState.prototype.render = function(renderer) {
+  this.goalParticleSystem.render();
   for(let anchor of this.anchors) {
-    if(anchor.goal) {
-      anchor.mesh.material.color.setRGB(0.5, 0.5, 0.1);
+    if(anchor.goal && anchor.Hexagon1Model) {
+      anchor.Hexagon1Model.material.emissiveIntensityTarget = 1;
       this.goalLight.position.copy(anchor.mesh.position);
-    } else {
-      anchor.mesh.material.color.setRGB(0.1, 0.0, 0.1);
+    } else if (anchor.Hexagon1Model) {
+      anchor.Hexagon1Model.material.emissiveIntensityTarget = 0.4;
+    }
+    if(anchor.goal && anchor.Hexagon2Model) {
+      anchor.Hexagon2Model.material.emissiveIntensityTarget = 1;
+    } else if (anchor.Hexagon1Model) {
+      anchor.Hexagon2Model.material.emissiveIntensityTarget = 0.4;
+    }
+    if(anchor.goal && anchor.GoldenSymbolModel) {
+      anchor.GoldenSymbolModel.material.emissiveIntensityTarget = 1;
+    } else if (anchor.GoldenSymbolModel) {
+      anchor.GoldenSymbolModel.material.emissiveIntensityTarget = 0;
+    }
+
+    if(anchor.Hexagon1Model) {
+      anchor.Hexagon1Model.material.emissiveIntensity = (
+          anchor.Hexagon1Model.material.emissiveIntensity * 0.95 + anchor.Hexagon1Model.material.emissiveIntensityTarget * 0.05);
+    }
+    if(anchor.Hexagon2Model) {
+      anchor.Hexagon2Model.material.emissiveIntensity = (
+          anchor.Hexagon2Model.material.emissiveIntensity * 0.95 + anchor.Hexagon2Model.material.emissiveIntensityTarget * 0.05);
+    }
+    if(anchor.GoldenSymbolModel) {
+      anchor.GoldenSymbolModel.material.emissiveIntensity = (
+          anchor.GoldenSymbolModel.material.emissiveIntensity * 0.95 + anchor.GoldenSymbolModel.material.emissiveIntensityTarget * 0.05);
     }
   }
+
   this.player1.render();
   this.player2.render();
   this.hud.render();
@@ -165,11 +196,6 @@ GameState.prototype.update = function() {
   SoundManager.update();
   this.player1.update();
   this.player2.update();
-  if(this.objyo) {
-    this.objyo.rotation.x += 0.01;
-    this.objyo.rotation.y += 0.02;
-    this.objyo.rotation.z += 0.03;
-  }
 
   const cameraCenter = Matter.Vector.mult(Matter.Vector.add(this.player1.body.position, this.player2.body.position), .5);
   const size = Matter.Vector.magnitude(Matter.Vector.sub(this.player1.body.position, this.player2.body.position));
@@ -182,11 +208,131 @@ GameState.prototype.update = function() {
   //this.camera.lookAt(cameraCenter.x, cameraCenter.y, 0);
 
   for(let anchor of this.anchors) {
-    anchor.mesh.rotation.y += 0.01;
+
+    if(anchor.goal) {
+      const angle = Math.random() * Math.PI * 2;
+      const dx = Math.sin(angle) * 20;
+      const dy = Math.cos(angle) * 20;
+      if(anchor.GoldenSymbolModel) {
+        /* z and y are swapped since GoldenSymbolModel is rotated inside mesh */
+        this.goalParticleSystem.spawn({
+          x: anchor.mesh.position.x + anchor.GoldenSymbolModel.position.x + dx,
+          y: anchor.mesh.position.y + anchor.GoldenSymbolModel.position.z + dy,
+          z: anchor.mesh.position.z + anchor.GoldenSymbolModel.position.y
+        }, {
+          x: 0,
+          y: 0,
+          z: 10
+        });
+      }
+    }
+
+    if(!anchor.GoldenSymbolModel && GameState.GoldenSymbolModel) {
+      const model = GameState.GoldenSymbolModel.clone();
+      anchor.GoldenSymbolModel = model;
+      anchor.GoldenSymbolModel.targetStartPosition = anchor.GoldenSymbolModel.position.clone();
+      anchor.GoldenSymbolModel.targetPosition = anchor.GoldenSymbolModel.position.clone();
+      anchor.GoldenSymbolModel.targetPosition.tStart = +new Date();
+      anchor.GoldenSymbolModel.targetPosition.tLength = 1;
+      anchor.GoldenSymbolModel.traverse(obj => {
+        if(obj.material) {
+          const color = obj.material.color;
+          obj.material = new THREE.MeshStandardMaterial({
+            color: 0x222222,
+            emissive: color,
+            emissiveIntensity: 0,
+          });
+          anchor.GoldenSymbolModel.material = obj.material;
+        }
+      });
+      anchor.mesh.add(model);
+    }
+    if(!anchor.Hexagon1Model && GameState.Hexagon1Model) {
+      const model = GameState.Hexagon1Model.clone();
+      anchor.Hexagon1Model = model;
+      anchor.Hexagon1Model.traverse(obj => {
+        if(obj.material) {
+          const color = obj.material.color;
+          obj.material = new THREE.MeshStandardMaterial({
+            color: 0x111111,
+            emissive: color,
+            emissiveIntensity: 0,
+          });
+          anchor.Hexagon1Model.material = obj.material;
+        }
+      });
+      anchor.mesh.add(model);
+    }
+    if(!anchor.Hexagon2Model && GameState.Hexagon2Model) {
+      const model = GameState.Hexagon2Model.clone();
+      anchor.Hexagon2Model = model;
+      anchor.Hexagon2Model.traverse(obj => {
+        if(obj.material) {
+          const color = obj.material.color;
+          obj.material = new THREE.MeshStandardMaterial({
+            color: 0x111111,
+            emissive: color,
+            emissiveIntensity: 0,
+          });
+          anchor.Hexagon2Model.material = obj.material;
+        }
+      });
+      anchor.mesh.add(model);
+    }
+
+    if(anchor.GoldenSymbolModel) {
+      const step = (+new Date() - anchor.GoldenSymbolModel.targetPosition.tStart) / anchor.GoldenSymbolModel.targetPosition.tLength;
+      if(anchor.goal) {
+        console.log(step, anchor.GoldenSymbolModel.targetStartPosition, anchor.GoldenSymbolModel.targetPosition, anchor.GoldenSymbolModel.position);
+      }
+      anchor.GoldenSymbolModel.position.x = smoothstep(anchor.GoldenSymbolModel.targetStartPosition.x, anchor.GoldenSymbolModel.targetPosition.x, step);
+      anchor.GoldenSymbolModel.position.y = smoothstep(anchor.GoldenSymbolModel.targetStartPosition.y, anchor.GoldenSymbolModel.targetPosition.y, step);
+      anchor.GoldenSymbolModel.position.z = smoothstep(anchor.GoldenSymbolModel.targetStartPosition.z, anchor.GoldenSymbolModel.targetPosition.z, step);
+    }
+
+    if(anchor.Hexagon1Model) {
+      anchor.Hexagon1Model.rotation.y += 0.01;
+      if(anchor.goal) {
+        anchor.Hexagon1Model.rotation.y += 0.02;
+      }
+    }
+    if(anchor.Hexagon2Model) {
+      anchor.Hexagon2Model.rotation.y -= 0.01;
+      if(anchor.goal) {
+        anchor.Hexagon2Model.rotation.y -= 0.02;
+      }
+    }
+    if(anchor.GoldenSymbolModel) {
+      //anchor.GoldenSymbolModel.rotation.y =  0.01 * Math.sin(+new Date() /300) * 30;
+      anchor.GoldenSymbolModel.rotation.x =  0.2 * Math.sin(+new Date() /500);
+      anchor.GoldenSymbolModel.rotation.z =  0.2 * Math.cos(+new Date() /500);
+    }
   }
+  this.goalParticleSystem.update();
   Matter.Engine.update(this.matterEngine);
   this.hud.update();
   this.hud.plane.position.x = this.camera.position.x;
   this.hud.plane.position.y = this.camera.position.y;
   this.hud.plane.position.z = this.camera.position.z + 2500;
 };
+
+
+(function() {
+var manager = new THREE.LoadingManager();
+const mixers = [];
+const loader = new THREE.FBXLoader( manager );
+loader.load( 'GoldenSymbol.fbx', object => {
+  GameState.GoldenSymbolModel = object;
+  object.scale.set(17.5, 17.5, 17.5);
+}, () => {console.log('progress')}, () => {console.log('onerror')});
+
+loader.load( 'Hexagon1.fbx', object => {
+  GameState.Hexagon1Model = object;
+  object.scale.set(17.5, 17.5, 17.5);
+}, () => {console.log('progress')}, () => {console.log('onerror')});
+
+loader.load( 'Hexagon2.fbx', object => {
+  GameState.Hexagon2Model = object;
+  object.scale.set(17.5, 17.5, 17.5);
+}, () => {console.log('progress')}, () => {console.log('onerror')});
+})();
