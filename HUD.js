@@ -22,16 +22,6 @@ function HUD(game) {
 
 HUD.prototype.render = function() {
   this.canvas.width = this.canvas.width;  // Reset canvas
-
-  this.ctx.fillStyle = 'white';
-  this.ctx.font="42px Arial";
-
-  this.ctx.textBaseline = "top";
-  this.ctx.textAlign = 'left';
-  this.ctx.fillText(parseInt(this.game.scores[0]).toString(), 40, 20);
-  this.ctx.textAlign = 'right';
-  this.ctx.fillText(parseInt(this.game.scores[1]).toString(), 1920 - 40, 20);
-
   this.ctx.strokeStyle = 'rgba(255, 255, 255, .2)';
   this.ctx.lineWidth = 4;
   for(let i = 0; i < 10; i++) {

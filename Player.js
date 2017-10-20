@@ -81,6 +81,7 @@ Player.prototype.update = function() {
     Matter.Body.setVelocity(this.body, {x: 0, y: 0});
     Matter.Body.setAngle(this.body, 0);
     Matter.Body.setAngularVelocity(this.body, 0);
+    this.game.scores[this.options.id] = 0;
   }
   this.mesh.rotation.x += 0.05;
   this.mesh.rotation.y += 0.03;
