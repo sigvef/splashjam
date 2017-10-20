@@ -4,6 +4,8 @@ function GameState() {
 
 GameState.prototype.init = function() {
 
+  this.introTimer = 0;
+
   this.scene = new THREE.Scene();
   this.camera = new THREE.Camera();
   this.camera = new THREE.PerspectiveCamera(25, 16 / 9, 1, 100000);
@@ -133,6 +135,7 @@ GameState.prototype.pause = function() {
 };
 
 GameState.prototype.resume = function() {
+  this.introTimer = 400;
   composer.passes = [];
   composer.addPass(new POSTPROCESSING.RenderPass(this.scene, this.camera));
   composer.addPass(new POSTPROCESSING.FilmPass({
@@ -247,11 +250,43 @@ GameState.prototype.render = function(renderer) {
   this.player1.render();
   this.player2.render();
   this.hud.render();
-  //renderer.render(this.scene, this.camera);
+  if(this.introTimer < 200 && this.introTimer > 0) {
+    this.player1.mesh.position.x = this.camera.position.x - 60;
+    this.player1.mesh.position.y = this.camera.position.y;
+    this.player1.mesh.position.z = this.camera.position.z + 400;
+    this.player1.mesh.rotation.x += 0.02;
+    this.player1.mesh.rotation.y += 0.01;
+    this.player1.mesh.rotation.z = 1;
+  }
+  if(this.introTimer >= 200 && this.introTimer < 400) {
+    this.player2.mesh.position.x = this.camera.position.x + 60;
+    this.player2.mesh.position.y = this.camera.position.y;
+    this.player2.mesh.position.z = this.camera.position.z + 400;
+    this.player2.mesh.rotation.x += 0.02;
+    this.player2.mesh.rotation.y += 0.01;
+    this.player2.mesh.rotation.z = -1;
+  }
+  if(this.introTimer == 1) {
+    this.player1.mesh.position.x = 0;
+    this.player1.mesh.position.y = 0;
+    this.player1.mesh.position.z = 0;
+    this.player2.mesh.position.x = 0;
+    this.player2.mesh.position.y = 0;
+    this.player2.mesh.position.z = 0;
+    this.player1.mesh.rotation.x = Math.PI / 2;
+    this.player1.mesh.rotation.y = 0;
+    this.player1.mesh.rotation.z = 0;
+    this.player2.mesh.rotation.x = Math.PI / 2;
+    this.player2.mesh.rotation.y = 0;
+    this.player2.mesh.rotation.z = 0;
+  }
   composer.render(1/60);
 };
 
 GameState.prototype.update = function() {
+  if(this.introTimer > 0) {
+    this.introTimer--;
+  };
   SoundManager.update();
   this.player1.update();
   this.player2.update();
@@ -261,6 +296,7 @@ GameState.prototype.update = function() {
   this.cameraTarget.x = cameraCenter.x;
   this.cameraTarget.y = cameraCenter.y;
   this.cameraTarget.z = -2000 -size / 2;
+
   this.camera.position.x = this.camera.position.x - (this.camera.position.x - this.cameraTarget.x) / 64;
   this.camera.position.y = this.camera.position.y - (this.camera.position.y - this.cameraTarget.y) / 64;
   this.camera.position.z = this.camera.position.z - (this.camera.position.z - this.cameraTarget.z) / 128;
@@ -373,7 +409,7 @@ GameState.prototype.update = function() {
   this.hud.update();
   this.hud.plane.position.x = this.camera.position.x;
   this.hud.plane.position.y = this.camera.position.y;
-  this.hud.plane.position.z = this.camera.position.z + 2500;
+  this.hud.plane.position.z = this.camera.position.z + 2000;
 };
 
 

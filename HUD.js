@@ -21,7 +21,42 @@ function HUD(game) {
 }
 
 HUD.prototype.render = function() {
+
+  this.texture.needsUpdate = true;
   this.canvas.width = this.canvas.width;  // Reset canvas
+
+  if(this.game.introTimer > 0) {
+    this.ctx.fillStyle = 'rgb(10, 0, 10)';
+    this.ctx.fillRect(0, 0, 1920, 1080);
+  }
+
+  if(this.game.introTimer < 400 && this.game.introTimer >= 200) {
+    this.ctx.fillStyle = 'rgba(100, 100, 100, 1)';
+    this.ctx.font = '80pt Arial';
+    const x = lerp(0, 200, (this.game.introTimer - 200) / 200);
+    this.ctx.save();
+    this.ctx.rotate(-0.15);
+    this.ctx.fillText('Alpha Blue', 200 + x, 500);
+    this.ctx.fillText('<^> + SPACE', 300 - x, 700);
+    this.ctx.restore();
+  }
+
+  if(this.game.introTimer < 200 && this.game.introTimer >= 1) {
+    this.ctx.fillStyle = 'rgba(100, 100, 100, 1)';
+    this.ctx.font = '80pt Arial';
+    const x = lerp(0, 200, (this.game.introTimer) / 200);
+    this.ctx.save();
+    this.ctx.rotate(0.15);
+    this.ctx.fillText('Orange Omega', 1000 + x, 300);
+    this.ctx.fillText('WASD + F', 1100 - x,  500);
+    this.ctx.restore();
+  }
+
+  if(this.game.introTimer > 0) {
+    return;
+  }
+
+
   this.ctx.strokeStyle = 'rgba(255, 255, 255, .2)';
   this.ctx.lineWidth = 4;
   for(let i = 0; i < 10; i++) {
@@ -51,8 +86,6 @@ HUD.prototype.render = function() {
       }
     }
   }
-
-  this.texture.needsUpdate = true;
 };
 
 HUD.prototype.update = function() {
