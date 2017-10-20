@@ -188,7 +188,7 @@ Player.prototype.update = function() {
           Matter.Vector.sub(
             this.body.position,
             anchor.body.position));
-      if(distanceSquared < 10000) {
+      if(distanceSquared < 12000) {
         this.currentAnchor = anchor;
         if(this.currentAnchor.goal) {
           this.game.score(this.options.id);
