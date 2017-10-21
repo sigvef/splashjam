@@ -270,7 +270,7 @@ Player.prototype.update = function() {
   }
 
   if(!this.currentAnchor) {
-    if(this.body.position.x < -1600 || this.body.position.x > 1600 || this.body.position.y < -600 || this.body.position.y > 2000) {
+    if(this.body.position.x < -1600 || this.body.position.x > 1600 || this.body.position.y < -2000 || this.body.position.y > 1500) {
       this.respawn();
     }
   }

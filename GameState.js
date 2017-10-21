@@ -44,12 +44,12 @@ GameState.prototype.init = function() {
     new Player(this, {
       id: 0,
       keys: {
-        jump: 32,
-        up: 38,
-        down: 40,
-        left: 37,
-        right: 39,
-        respawn: 16,
+        jump: 69,
+        up: 87,
+        down: 83,
+        left: 65,
+        right: 68,
+        respawn: 82,
       },
       position: {
         x: 600,
@@ -60,12 +60,12 @@ GameState.prototype.init = function() {
     new Player(this, {
       id: 1,
       keys: {
-        jump: 69,
-        up: 87,
-        down: 83,
-        left: 65,
-        right: 68,
-        respawn: 82,
+        jump: 32,
+        up: 38,
+        down: 40,
+        left: 37,
+        right: 39,
+        respawn: 16,
       },
       position: {
         x: -600,
@@ -476,7 +476,7 @@ GameState.prototype.update = function() {
         this.BGG0.material = obj.material;
       }
     });
-    this.bglayer0.add(model);
+    //this.bglayer0.add(model);
   }
   if(GameState.BGG1 && !this.BGG1) {
     const model = GameState.BGG1.clone();
@@ -491,7 +491,7 @@ GameState.prototype.update = function() {
         this.BGG1.material = obj.material;
       }
     });
-    this.bglayer1.add(model);
+    //this.bglayer1.add(model);
   }
   if(GameState.BGG2 && !this.BGG2) {
     const model = GameState.BGG2.clone();
@@ -506,7 +506,7 @@ GameState.prototype.update = function() {
         this.BGG2.material = obj.material;
       }
     });
-    this.bglayer2.add(model);
+    //this.bglayer2.add(model);
   }
   if(GameState.BGG3 && !this.BGG3) {
     const model = GameState.BGG3.clone();
@@ -521,7 +521,7 @@ GameState.prototype.update = function() {
         this.BGG3.material = obj.material;
       }
     });
-    this.bglayer3.add(model);
+    //this.bglayer3.add(model);
   }
 
   const BGLcolor = bgcolor;

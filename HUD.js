@@ -47,7 +47,7 @@ HUD.prototype.render = function() {
     this.ctx.rotate(-0.15);
     this.ctx.scale(0.5, 0.5);
     this.ctx.drawImage(Blue_Alpha_title, 0 + x, 800);
-    this.ctx.drawImage(Blue_Alpha_ctrls, 100 - x, 1100);
+    this.ctx.drawImage(Blue_Alpha_ctrls, 100 - x, 1200);
     this.ctx.restore();
   }
 
@@ -59,14 +59,13 @@ HUD.prototype.render = function() {
     this.ctx.rotate(0.15);
     this.ctx.scale(0.5, 0.5);
     this.ctx.drawImage(Orange_Omega_title, 1500 + x, 300);
-    this.ctx.drawImage(Orange_Omega_ctrls, 1600 - x, 700);
+    this.ctx.drawImage(Orange_Omega_ctrls, 1600 - x, 800);
     this.ctx.restore();
   }
 
   if(this.game.introTimer > 0) {
     return;
   }
-
 
   this.ctx.strokeStyle = 'rgba(255, 255, 255, .2)';
   this.ctx.lineWidth = 4;
