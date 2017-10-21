@@ -325,7 +325,7 @@ GameState.prototype.render = function(renderer) {
   this.player2.render();
   this.hud.render();
   if(this.introTimer < 200 && this.introTimer > 0) {
-    this.player1.mesh.position.x = this.camera.position.x - 60;
+    this.player1.mesh.position.x = this.camera.position.x - 80;
     this.player1.mesh.position.y = this.camera.position.y;
     this.player1.mesh.position.z = this.camera.position.z + 400;
     this.player1.mesh.rotation.x += 0.02;
@@ -333,7 +333,7 @@ GameState.prototype.render = function(renderer) {
     this.player1.mesh.rotation.z = 1;
   }
   if(this.introTimer >= 200 && this.introTimer < 400) {
-    this.player2.mesh.position.x = this.camera.position.x + 60;
+    this.player2.mesh.position.x = this.camera.position.x + 80;
     this.player2.mesh.position.y = this.camera.position.y;
     this.player2.mesh.position.z = this.camera.position.z + 400;
     this.player2.mesh.rotation.x += 0.02;
@@ -356,13 +356,13 @@ GameState.prototype.render = function(renderer) {
     this.camera.position.z = -1500;
   }
   if(this.winner !== undefined) {
-    this.players[this.winner].mesh.position.x = this.camera.position.x + 60;
+    this.players[this.winner].mesh.position.x = this.camera.position.x;
     this.players[this.winner].mesh.position.y = this.camera.position.y;
     this.players[this.winner].mesh.position.z = this.camera.position.z + 400;
-    this.players[this.winner].particleSystem.particles.position.x = this.camera.position.x + 60;
+    this.players[this.winner].particleSystem.particles.position.x = this.camera.position.x;
     this.players[this.winner].particleSystem.particles.position.y = this.camera.position.y;
     this.players[this.winner].particleSystem.particles.position.z = this.camera.position.z + 400;
-    this.players[this.winner].mesh.position.z = this.camera.position.z + 400;
+    this.players[this.winner].particleSystem.spawn(this.players[this.winner].mesh.position, {x: 0, y: 1, z: 0});
     this.players[this.winner].mesh.rotation.x += 0.02;
     this.players[this.winner].mesh.rotation.y += 0.01;
     this.players[this.winner].mesh.rotation.z = -1;

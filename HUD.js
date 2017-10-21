@@ -20,6 +20,15 @@ function HUD(game) {
   this.game.scene.add(this.plane);
 }
 
+const Blue_Alpha_ctrls = document.createElement('img');
+Blue_Alpha_ctrls.src = 'res/Blue_Alpha_ctrls.png';
+const Blue_Alpha_title = document.createElement('img');
+Blue_Alpha_title.src = 'res/Blue_Alpha_title.png';
+const Orange_Omega_ctrls = document.createElement('img');
+Orange_Omega_ctrls.src = 'res/Orange_omega_ctrls.png';
+const Orange_Omega_title = document.createElement('img');
+Orange_Omega_title.src = 'res/Orange_omega_title.png';
+
 HUD.prototype.render = function() {
 
   this.texture.needsUpdate = true;
@@ -36,8 +45,9 @@ HUD.prototype.render = function() {
     const x = lerp(0, 200, (this.game.introTimer - 200) / 200);
     this.ctx.save();
     this.ctx.rotate(-0.15);
-    this.ctx.fillText('Alpha Blue', 200 + x, 500);
-    this.ctx.fillText('<^> + SPACE', 300 - x, 700);
+    this.ctx.scale(0.5, 0.5);
+    this.ctx.drawImage(Blue_Alpha_title, 0 + x, 800);
+    this.ctx.drawImage(Blue_Alpha_ctrls, 100 - x, 1100);
     this.ctx.restore();
   }
 
@@ -47,8 +57,9 @@ HUD.prototype.render = function() {
     const x = lerp(0, 200, (this.game.introTimer) / 200);
     this.ctx.save();
     this.ctx.rotate(0.15);
-    this.ctx.fillText('Orange Omega', 1000 + x, 300);
-    this.ctx.fillText('WASD + F', 1100 - x,  500);
+    this.ctx.scale(0.5, 0.5);
+    this.ctx.drawImage(Orange_Omega_title, 1500 + x, 300);
+    this.ctx.drawImage(Orange_Omega_ctrls, 1600 - x, 700);
     this.ctx.restore();
   }
 
