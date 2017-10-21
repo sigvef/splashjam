@@ -25,7 +25,7 @@ HUD.prototype.render = function() {
   this.texture.needsUpdate = true;
   this.canvas.width = this.canvas.width;  // Reset canvas
 
-  if(this.game.introTimer > 0) {
+  if(this.game.introTimer > 0 || this.game.winner !== undefined) {
     this.ctx.fillStyle = 'rgb(10, 0, 10)';
     this.ctx.fillRect(0, 0, 1920, 1080);
   }
@@ -62,7 +62,7 @@ HUD.prototype.render = function() {
   for(let i = 0; i < 10; i++) {
     this.ctx.beginPath();
     const x = 1920 / 2 + (i-4.5) * 100;
-    const y = 40;
+    const y = 60;
     this.ctx.arc(x, y, 30, 0, Math.PI * 2);
     if(i < 5) {
       const playerId = 1;
