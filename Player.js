@@ -6,7 +6,6 @@ function Player(game, options) {
   this.spinster = 0;
   this.innerModel = undefined;
   this.outerModel = undefined;
-  this.respawnFlag = false;
   this.lightningMaterial = makeLightningMaterial();
   this.body = Matter.Bodies.circle(
       0, 0, 10, { density: 0.004, frictionAir: 0.005});
@@ -104,7 +103,7 @@ Player.prototype.respawn = function() {
     }
   }
   this.playRespawnSound();
-}
+};
 
 Player.prototype.update = function() {
   if(!this.innerModel && Player.innerModel) {
@@ -151,12 +150,6 @@ Player.prototype.update = function() {
   }
   this.particleSystem.update();
   this.innerModel.material.emissiveIntensity = BEATPULSE * 2;
-  if (KEYS[this.options.keys.respawn] && !this.respawnFlag) {
-    this.respawnFlag = true;
-  }
-  if (!KEYS[this.options.keys.respawn]) {
-    this.respawnFlag = false;
-  }
   if(this.currentAnchor) {
     const forceMultiplier = 0.00005;
     const p1 = this.currentAnchor.body.position;
