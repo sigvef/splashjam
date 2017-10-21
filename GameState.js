@@ -223,7 +223,7 @@ GameState.prototype.score = function(playerId) {
     SoundManager.playSound('win');
     setTimeout(() => {
       this.winner = playerId;
-    }, 1000)
+    }, 1000);
     setTimeout(() => {
       sm.addState("game", new GameState());
       sm.changeState("game");
@@ -257,6 +257,7 @@ GameState.prototype.spawnGoal = function() {
   const anchor = nextAnchorCandidates[candidateIndex];
   anchor.goal = true;
   this.currentGoal = anchor;
+  console.log(anchor)
   anchor.mesh.add(anchor.GoldenSymbolModel);
   if(anchor.GoldenSymbolModel) {
     anchor.GoldenSymbolModel.targetStartPosition.copy(anchor.GoldenSymbolModel.position);
@@ -373,7 +374,7 @@ GameState.prototype.render = function(renderer) {
 GameState.prototype.update = function() {
   if(this.introTimer > 0) {
     this.introTimer--;
-  };
+  }
   SoundManager.update();
   this.player1.update();
   this.player2.update();

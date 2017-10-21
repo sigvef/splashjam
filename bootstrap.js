@@ -76,6 +76,11 @@ function loop() {
 }
 
 function bootstrap() {
+  if (Modernizr.mobile || Modernizr.tablet || Modernizr.phone) {
+    alert(
+      'Warning: This game is designed for computers with hardware keyboards. Quick, go find your laptop/desktop computer!'
+    );
+  }
 
   loaded = 1;
 

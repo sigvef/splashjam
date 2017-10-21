@@ -14,7 +14,7 @@
       }
     </style>
   </head>
-  <body>
+  <body onload="bootstrap()">
     <script src=lib/zlib.js></script>
     <script src=lib/three.min.js></script>
     <script src=lib/postprocessing.js></script>
@@ -24,6 +24,9 @@
     <script src=ParticleSystem.js></script>
     <script src=lib/soundjs.min.js></script>
     <script src=lib/limit.js></script>
+    <script src=lib/modernizr-custom.js></script>
+    <script src=lib/mobile-detect.min.js></script>
+    <script src=lib/mobile-detect-modernizr.js></script>
     <script src=SoundManager.js></script>
     <script src=Player.js></script>
     <script src=HUD.js></script>
@@ -31,6 +34,5 @@
     <script src=GameState.js></script>
     <script src=StateManager.js></script>
     <script src=bootstrap.js></script>
-    <script>bootstrap()</script>
   </body>
 </html>
