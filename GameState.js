@@ -52,7 +52,7 @@ GameState.prototype.init = function() {
         respawn: 82,
       },
       position: {
-        x: 600,
+        x: -600,
         y: -200,
       },
       color: 0xf39304,
@@ -68,7 +68,7 @@ GameState.prototype.init = function() {
         respawn: 16,
       },
       position: {
-        x: -600,
+        x: 600,
         y: -200,
       },
       color: 0x0ab9bf,
@@ -257,7 +257,6 @@ GameState.prototype.spawnGoal = function() {
   const anchor = nextAnchorCandidates[candidateIndex];
   anchor.goal = true;
   this.currentGoal = anchor;
-  console.log(anchor)
   anchor.mesh.add(anchor.GoldenSymbolModel);
   if(anchor.GoldenSymbolModel) {
     anchor.GoldenSymbolModel.targetStartPosition.copy(anchor.GoldenSymbolModel.position);

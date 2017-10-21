@@ -75,7 +75,7 @@ HUD.prototype.render = function() {
     const y = 60;
     this.ctx.arc(x, y, 30, 0, Math.PI * 2);
     if(i < 5) {
-      const playerId = 1;
+      const playerId = 0;
       const color = new THREE.Color(this.game.players[playerId].options.color);
       const style = `rgba(${color.r * 255 | 0}, ${color.g * 255 | 0}, ${color.b * 255 | 0}, 0.5`;
       this.ctx.strokeStyle = style;
@@ -85,7 +85,7 @@ HUD.prototype.render = function() {
         this.ctx.fill();
       }
     } else {
-      const playerId = 0;
+      const playerId = 1;
       const color = new THREE.Color(this.game.players[playerId].options.color);
       const style = `rgba(${color.r * 255 | 0}, ${color.g * 255 | 0}, ${color.b * 255 | 0}, 0.5`;
       this.ctx.strokeStyle = style;
