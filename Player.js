@@ -273,6 +273,8 @@ Player.prototype.update = function() {
     if(this.body.position.x < -1600 || this.body.position.x > 1600 || this.body.position.y < -2000 || this.body.position.y > 1500) {
       this.respawn();
     }
+  } else if (this.body.position .y < -3000 || this.body.position.y > 2000) {
+    this.respawn();
   }
 };
 
