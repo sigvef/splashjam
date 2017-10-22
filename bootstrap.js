@@ -63,6 +63,21 @@ function loop() {
   t = +new Date();
   dt += (t - old_time);
   old_time = t;
+
+  const gamepads = (navigator.getGamepads && navigator.getGamepads()) || [];
+  JOYCONS = {};
+  for(let i = 0; i < gamepads.length; i++) {
+    const gamepad = gamepads[i];
+    if(!gamepad) {
+      continue;
+    }
+    if(gamepad.id == 'Wireless Gamepad (Vendor: 057e Product: 2006)') {
+      JOYCONS.left = gamepad.index;
+    }
+    if(gamepad.id == 'Wireless Gamepad (Vendor: 057e Product: 2007)') {
+      JOYCONS.right = gamepad.index;
+    }
+  }
   while (dt > 20) {
     sm.update();
     dt -= 20;
@@ -105,6 +120,9 @@ function bootstrap() {
   document.addEventListener("keydown", function(e) {
     KEYS[e.keyCode] = true;
   });
+
+  JOYCONS = {
+  };
 
   document.addEventListener("keyup", function(e) {
     KEYS[e.keyCode] = false;

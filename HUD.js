@@ -96,6 +96,16 @@ HUD.prototype.render = function() {
       }
     }
   }
+
+  this.ctx.font = '14pt Arial';
+  this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+  if(JOYCONS.left !== undefined) {
+    this.ctx.fillText('Left joycon connected', 20, 1060);
+  }
+  if(JOYCONS.right !== undefined) {
+    this.ctx.textAlign = 'right';
+    this.ctx.fillText('Right joycon connected', 1900, 1060);
+  }
 };
 
 HUD.prototype.update = function() {

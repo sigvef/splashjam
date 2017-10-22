@@ -62,6 +62,9 @@ function Player(game, options) {
 }
 
 Player.prototype.render = function() {
+  this.ropeMesh.visible = true;
+  this.particleSystem.particles.position.x = 0;
+  this.particleSystem.particles.position.y = 0;
   this.particleSystem.render();
   this.mesh.position.x = this.body.position.x;
   this.mesh.position.y = this.body.position.y;
@@ -150,6 +153,15 @@ Player.prototype.update = function() {
   }
   this.particleSystem.update();
   this.innerModel.material.emissiveIntensity = BEATPULSE * 2;
+
+  let joycon = navigator.getGamepads()[JOYCONS[this.options.joycon.id]];
+  if(!joycon) {
+    joycon = {
+      axes: 'something long that is subscriptable',
+      buttons: 'something long that is subscriptable',
+    };
+  }
+
   if(this.currentAnchor) {
     const forceMultiplier = 0.00005;
     const p1 = this.currentAnchor.body.position;
@@ -159,25 +171,26 @@ Player.prototype.update = function() {
       y: p2.y - p1.y,
     }, Math.PI / 2);
     const normalised = Matter.Vector.normalise(rotated);
-    if(KEYS[this.options.keys.left]) {
+
+    if(KEYS[this.options.keys.left] || joycon.axes[9] == this.options.joycon.left || joycon.axes[9] == this.options.joycon.upleft || joycon.axes[9] == this.options.joycon.downleft) {
       Matter.Body.applyForce(
         this.body,
         this.body.position,
         {x: -0.001, y: 0});
     }
-    if(KEYS[this.options.keys.right]) {
+    if(KEYS[this.options.keys.right] || joycon.axes[9] == this.options.joycon.right || joycon.axes[9] == this.options.joycon.upright || joycon.axes[9] == this.options.joycon.downright) {
       Matter.Body.applyForce(
         this.body,
         this.body.position,
         {x: 0.001, y: 0});
     }
-    if(KEYS[this.options.keys.up]) {
+    if(KEYS[this.options.keys.up] || joycon.axes[9] == this.options.joycon.up || joycon.axes[9] == this.options.joycon.upleft || joycon.axes[9] == this.options.joycon.upright) {
       Matter.Body.applyForce(
         this.body,
         this.body.position,
         {x: 0, y: -0.001});
     }
-    if(KEYS[this.options.keys.down]) {
+    if(KEYS[this.options.keys.down] || joycon.axes[9] == this.options.joycon.down || joycon.axes[9] == this.options.joycon.downleft || joycon.axes[9] == this.options.joycon.downright) {
       Matter.Body.applyForce(
         this.body,
         this.body.position,
@@ -265,7 +278,7 @@ Player.prototype.update = function() {
   }
   this.spinster *= 0.9;
   this.mesh.rotation.z = this.spinster;
-  if(KEYS[this.options.keys.jump]) {
+  if(KEYS[this.options.keys.jump] || joycon.buttons[this.options.joycon.jump].pressed) {
     this.disconnectRope();
   }
 

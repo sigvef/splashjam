@@ -51,6 +51,26 @@ GameState.prototype.init = function() {
         right: 68,
         respawn: 82,
       },
+      gamepad: {
+        /*
+        jump: 14,
+        jump2: 4,
+        leftright: 0,
+        updown: 1,
+        */
+      },
+      joycon: {
+        id: 'left',
+        up: -1,
+        upright: -0.7142857313156128,
+        right: -0.4285714030265808,
+        downright: -0.1428571343421936,
+        down: 0.14285719394683838,
+        downleft: 0.4285714626312256,
+        left: 0.7142857313156128,
+        upleft: 1,
+        jump: 1,
+      },
       position: {
         x: -600,
         y: -200,
@@ -66,6 +86,24 @@ GameState.prototype.init = function() {
         left: 37,
         right: 39,
         respawn: 16,
+      },
+      gamepad: {
+        jump: 1,
+        jump2: 5,
+        leftright: 2,
+        updown: 3,
+      },
+      joycon: {
+        id: 'right',
+        up: -1,
+        upright: -0.7142857313156128,
+        right: -0.4285714030265808,
+        downright: -0.1428571343421936,
+        down: 0.14285719394683838,
+        downleft: 0.4285714626312256,
+        left: 0.7142857313156128,
+        upleft: 1,
+        jump: 1,
       },
       position: {
         x: 600,
