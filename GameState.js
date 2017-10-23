@@ -3,6 +3,28 @@ function GameState() {
 }
 
 CONTROLS = [{
+  name: 'IJKL + O [keyboard]',
+  active: false,
+  keyboard: {
+    jump: 79,
+    up: 73,
+    down: 75,
+    left: 74,
+    right: 76,
+  },
+  joycon: {},
+}, {
+  name: 'TFGH + Y [keyboard]',
+  active: false,
+  keyboard: {
+    jump: 89,
+    up: 84,
+    down: 71,
+    left: 70,
+    right: 72,
+  },
+  joycon: {},
+}, {
   name: 'WASD + E [keyboard]',
   active: false,
   keyboard: {
@@ -11,7 +33,6 @@ CONTROLS = [{
     down: 83,
     left: 65,
     right: 68,
-    respawn: 82,
   },
   joycon: {},
 }, {
@@ -40,7 +61,6 @@ CONTROLS = [{
     down: 40,
     left: 37,
     right: 39,
-    respawn: 16,
   },
   joycon: {},
 }, {

@@ -84,7 +84,7 @@ Player.prototype.renderHUD = function(ctx, up, rightAlign) {
     ctx.fillStyle = styleFromColor(this.options.color, 0.1);
     ctx.textAlign = rightAlign ? 'right' : 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Press any button to join', 1920 / 2 + (rightAlign ?  -120 : 120), up ? 60 : 1080 - 60);
+    ctx.fillText('[Press any button to join]', 1920 / 2 + (rightAlign ?  -120 : 120), up ? 60 : 1080 - 60);
     ctx.restore();
   } else {
     ctx.save();
