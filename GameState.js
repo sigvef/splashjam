@@ -2,6 +2,77 @@
 function GameState() {
 }
 
+CONTROLS = [{
+  name: 'wasd',
+  active: false,
+  keyboard: {
+    jump: 69,
+    up: 87,
+    down: 83,
+    left: 65,
+    right: 68,
+    respawn: 82,
+  },
+  joycon: {},
+}, {
+  name: 'left joycon',
+  active: false,
+  keyboard: {},
+  joycon: {
+    id: 'left',
+    up: -1,
+    upright: -0.7142857313156128,
+    right: -0.4285714030265808,
+    downright: -0.1428571343421936,
+    down: 0.14285719394683838,
+    downleft: 0.4285714626312256,
+    left: 0.7142857313156128,
+    upleft: 1,
+    jump: 1,
+    boost: 0,
+  },
+}, {
+  name: 'arrow keys',
+  active: false,
+  keyboard: {
+    jump: 32,
+    up: 38,
+    down: 40,
+    left: 37,
+    right: 39,
+    respawn: 16,
+  },
+  joycon: {},
+}, {
+  name: 'xbox 360 s game pad',
+  active: false,
+  keyboard: {},
+  gamepad: {
+    jump: 1,
+    jump2: 5,
+    leftright: 2,
+    updown: 3,
+  },
+  joycon: {},
+}, {
+  name: 'right joycon',
+  active: false,
+  keyboard: {},
+  joycon: {
+    id: 'right',
+    up: -1,
+    upright: -0.7142857313156128,
+    right: -0.4285714030265808,
+    downright: -0.1428571343421936,
+    down: 0.14285719394683838,
+    downleft: 0.4285714626312256,
+    left: 0.7142857313156128,
+    upleft: 1,
+    jump: 1,
+    boost: 0,
+  },
+}];
+
 GameState.prototype.init = function() {
 
   this.introTimer = 0;
@@ -43,34 +114,6 @@ GameState.prototype.init = function() {
   this.players = [
     new Player(this, {
       id: 0,
-      keys: {
-        jump: 69,
-        up: 87,
-        down: 83,
-        left: 65,
-        right: 68,
-        respawn: 82,
-      },
-      gamepad: {
-        /*
-        jump: 14,
-        jump2: 4,
-        leftright: 0,
-        updown: 1,
-        */
-      },
-      joycon: {
-        id: 'left',
-        up: -1,
-        upright: -0.7142857313156128,
-        right: -0.4285714030265808,
-        downright: -0.1428571343421936,
-        down: 0.14285719394683838,
-        downleft: 0.4285714626312256,
-        left: 0.7142857313156128,
-        upleft: 1,
-        jump: 1,
-      },
       position: {
         x: -600,
         y: -200,
@@ -79,62 +122,35 @@ GameState.prototype.init = function() {
     }),
     new Player(this, {
       id: 1,
-      keys: {
-        jump: 32,
-        up: 38,
-        down: 40,
-        left: 37,
-        right: 39,
-        respawn: 16,
-      },
-      gamepad: {
-        jump: 1,
-        jump2: 5,
-        leftright: 2,
-        updown: 3,
-      },
-      joycon: {
-        id: 'right',
-        up: -1,
-        upright: -0.7142857313156128,
-        right: -0.4285714030265808,
-        downright: -0.1428571343421936,
-        down: 0.14285719394683838,
-        downleft: 0.4285714626312256,
-        left: 0.7142857313156128,
-        upleft: 1,
-        jump: 1,
-      },
       position: {
         x: 600,
         y: -200,
       },
       color: 0x0ab9bf,
+    }),
+    new Player(this, {
+      id: 2,
+      position: {
+        x: 0,
+        y: 50,
+      },
+      color: 0xff1020,
+    }),
+    new Player(this, {
+      id: 3,
+      position: {
+        x: 0,
+        y: -400,
+      },
+      color: 0x20ff40,
     })
   ];
-  this.player1 = this.players[0];  // deprecated variable, use players[0] instead
-  this.player2 = this.players[1];  // deprecated variable, use players[1] instead
-  Matter.World.add(this.matterEngine.world, this.player1.body);
-  Matter.World.add(this.matterEngine.world, this.player2.body);
 
-  this.scores = [0, 0];
-
-  /*
-  let render = Matter.Render.create({
-        element: document.body,
-        engine: this.matterEngine,
-        options: {
-          showAngleIndicator: true,
-          showCollisions: true,
-          showVelocity: true
-        }
-  });
-  Matter.Render.run(render);
-  Matter.Render.lookAt(render, {
-            min: { x: -800, y: -600 },
-            max: { x: 800, y: 600 }
-                });
-  */
+  this.scores = [];
+  for(let player of this.players) {
+    player.deactivate();
+    this.scores.push(0);
+  }
 
   this.anchorPositions = [[
     {x: -600, y: 0},
@@ -215,8 +231,20 @@ GameState.prototype.init = function() {
 GameState.prototype.pause = function() {
 };
 
+GameState.prototype.reset = function() {
+  this.introTimer = 4;
+  this.winner = undefined;
+  for(let i in this.scores) {
+    this.scores[i] = 0;
+  }
+  for(let player of this.players) {
+    player.reset(); 
+    player.respawn(); 
+  }
+  this.spawnGoal();
+};
+
 GameState.prototype.resume = function() {
-  this.introTimer = 400;
   composer.passes = [];
   composer.addPass(new POSTPROCESSING.RenderPass(this.scene, this.camera));
   composer.addPass(new POSTPROCESSING.FilmPass({
@@ -249,10 +277,6 @@ GameState.prototype.score = function(playerId) {
       z: (Math.random() - 0.5) * 10,
     });
   }
-  /*
-  this.camera.position.x = this.players[playerId].body.position.x;
-  this.camera.position.y = this.players[playerId].body.position.y;
-  */
   this.camera.position.z *= 0.98; 
   this.scores[playerId]++;
   this.scores[0] = Math.max(0, this.scores[0]);
@@ -263,8 +287,7 @@ GameState.prototype.score = function(playerId) {
       this.winner = playerId;
     }, 1000);
     setTimeout(() => {
-      sm.addState("game", new GameState());
-      sm.changeState("game");
+      this.reset();
     }, 4000)
   } else {
     this.spawnGoal();
@@ -276,8 +299,20 @@ GameState.prototype.spawnGoal = function() {
   let nextAnchorCandidates = [];
   for (let i = 2; i < this.anchors.length; i++) {
     const anchor = this.anchors[i];
-    if (!anchor.goal && this.player1.currentAnchor !== anchor && this.player2.currentAnchor !== anchor) {
-      nextAnchorCandidates.push(anchor);
+    if (!anchor.goal) {
+      let allowed = true;
+      for(let player of this.players) {
+        if(!player.active) {
+          continue;
+        }
+        if(player.currentAnchor === anchor) {
+          allowed = false;
+          break;
+        }
+      }
+      if(allowed) {
+        nextAnchorCandidates.push(anchor);
+      }
     }
   }
   for(let anchor of this.anchors) {
@@ -359,9 +394,12 @@ GameState.prototype.render = function(renderer) {
     }
   }
 
-  this.player1.render();
-  this.player2.render();
+  for(let player of this.players) {
+    player.render();
+  }
   this.hud.render();
+
+  /*
   if(this.introTimer < 200 && this.introTimer > 0) {
     this.player1.mesh.position.x = this.camera.position.x - 80;
     this.player1.mesh.position.y = this.camera.position.y;
@@ -393,6 +431,7 @@ GameState.prototype.render = function(renderer) {
     this.player2.mesh.rotation.z = 0;
     this.camera.position.z = -1500;
   }
+  */
   if(this.winner !== undefined) {
     this.players[this.winner].mesh.position.x = this.camera.position.x;
     this.players[this.winner].mesh.position.y = this.camera.position.y;
@@ -408,13 +447,48 @@ GameState.prototype.render = function(renderer) {
   composer.render(1/60);
 };
 
+GameState.prototype.activateNextPlayer = function(controls) {
+  for(let player of this.players) {
+    if(!player.active) {
+      controls.active = true;
+      player.activate(controls);
+      return;
+    }
+  }
+};
+
 GameState.prototype.update = function() {
   if(this.introTimer > 0) {
     this.introTimer--;
   }
   SoundManager.update();
-  this.player1.update();
-  this.player2.update();
+
+  outer:
+  for(let controls of CONTROLS) {
+    if(controls.active) {
+      continue;
+    }
+    for(let keycodeId in controls.keyboard) {
+      const keycode = controls.keyboard[keycodeId];
+      if(KEYS[keycode]) {
+        this.activateNextPlayer(controls);
+        continue outer;
+      }
+    }
+    const joycon = navigator.getGamepads()[JOYCONS[controls.joycon.id]];
+    if(joycon) {
+      for(let button of joycon.buttons) {
+        if(button.pressed) {
+          this.activateNextPlayer(controls);
+          continue outer;
+        }
+      }
+    }
+  }
+
+  for(let player of this.players) {
+    player.update();
+  }
 
   let goalAnchor = null;
   const bgcolor = 0x02040F;
@@ -642,16 +716,30 @@ GameState.prototype.update = function() {
   this.bglayer3.rotation.z -= 0.01 * BEATPULSE * BEATPULSE + 0.002;
   this.bglayer4.rotation.z += 0.01 * BEATPULSE * BEATPULSE + 0.002;
 
-  const cameraCenter = Matter.Vector.mult(Matter.Vector.add(this.player1.body.position, this.player2.body.position), .5);
-  const size = Matter.Vector.magnitude(Matter.Vector.sub(this.player1.body.position, this.player2.body.position));
+  let cameraCenter = {x: 0, y: 0};
+  let numberOfActivePlayers = 0;
+  for(let player of this.players) {
+    if(!player.active) {
+      continue;
+    }
+    numberOfActivePlayers++;
+    cameraCenter = Matter.Vector.add(cameraCenter, player.body.position);
+  }
+  if(numberOfActivePlayers) {
+    cameraCenter = Matter.Vector.mult(cameraCenter, 1 / numberOfActivePlayers);
+  }
+  let maxDistance = 50;
+  for(let player of this.players) {
+    const distance = Matter.Vector.magnitude(Matter.Vector.sub(cameraCenter, player.body.position));
+    maxDistance = Math.max(distance, maxDistance);
+  }
   this.cameraTarget.x = cameraCenter.x;
   this.cameraTarget.y = cameraCenter.y;
-  this.cameraTarget.z = -2000 -size / 2;
+  this.cameraTarget.z = -2000 -maxDistance / 2;
 
   this.camera.position.x = this.camera.position.x - (this.camera.position.x - this.cameraTarget.x) / 64;
   this.camera.position.y = this.camera.position.y - (this.camera.position.y - this.cameraTarget.y) / 64;
   this.camera.position.z = this.camera.position.z - (this.camera.position.z - this.cameraTarget.z) / 128;
-  //this.camera.lookAt(cameraCenter.x, cameraCenter.y, 0);
 
   for(let anchor of this.anchors) {
 
@@ -758,12 +846,6 @@ GameState.prototype.update = function() {
       anchor.GoldenSymbolModel.rotation.x =  0.2 * Math.sin(+new Date() /500);
       anchor.GoldenSymbolModel.rotation.z =  0.2 * Math.cos(+new Date() /500);
     }
-  }
-
-  // Calculate camera position
-  let positions = [this.player1.body.position, this.player2.body.position];
-  if (goalAnchor) {
-    positions.push(goalAnchor.body.position);
   }
 
   this.goalParticleSystem.update();

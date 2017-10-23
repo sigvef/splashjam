@@ -2,6 +2,7 @@ function Player(game, options) {
   let that = this;
 
   this.options = options;
+  this.active = false;
   this.game = game;
   this.spinster = 0;
   this.innerModel = undefined;
@@ -61,13 +62,73 @@ function Player(game, options) {
   }.throttle(300, that);
 }
 
+Player.prototype.reset = function() {
+  this.particleSystem.particles.position.z = 0;
+};
+
+Player.prototype.deactivate = function() {
+  this.active = false;
+  Matter.World.remove(this.game.matterEngine.world, this.body);
+};
+
+function styleFromColor(color, alpha) {
+  const threeColor = new THREE.Color(color);
+  const style = `rgba(${threeColor.r * 255 | 0}, ${threeColor.g * 255 | 0}, ${threeColor.b * 255 | 0}, ${alpha}`;
+  return style;
+}
+
+Player.prototype.renderHUD = function(ctx, up, rightAlign) {
+  if(!this.active) {
+    ctx.save();   
+    ctx.font = '20pt Arial';
+    ctx.fillStyle = styleFromColor(this.options.color, 0.1);
+    ctx.textAlign = rightAlign ? 'right' : 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Press any button to join', 1920 / 2 + (rightAlign ?  -120 : 120), up ? 60 : 1080 - 60);
+    ctx.restore();
+  } else {
+    ctx.save();
+    ctx.lineWidth = 4;
+    for(let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      const x = 1920 / 2 + (i-4.5) * 100 * (rightAlign ? 1 : -1);
+      const y = up ? 60 : 1080 - 60;
+      ctx.arc(x, y, 30, 0, Math.PI * 2);
+      if(this.active) {
+        const color = new THREE.Color(this.options.color);
+        const style = `rgba(${color.r * 255 | 0}, ${color.g * 255 | 0}, ${color.b * 255 | 0}, 0.5`;
+        ctx.strokeStyle = style;
+        ctx.stroke();
+        if(i - this.game.scores[this.options.id] < 0) {
+          ctx.fillStyle = `rgba(${2 * color.r * 255 | 0}, ${2 * color.g * 255 | 0}, ${2 * color.b * 255 | 0}, 0.8)`;
+          ctx.fill();
+        }
+      }
+    }
+    ctx.restore();
+  }
+};
+
+Player.prototype.activate = function(controls) {
+  this.controls = controls;
+  this.active = true;
+  Matter.World.add(this.game.matterEngine.world, this.body);
+  this.mesh.visible = true;
+  this.particleSystem.particles.visible = true;
+  this.ropeMesh.visible = true;
+};
+
 Player.prototype.render = function() {
+  if(!this.active) {
+    return;
+  }
   this.ropeMesh.visible = true;
   this.particleSystem.particles.position.x = 0;
   this.particleSystem.particles.position.y = 0;
   this.particleSystem.render();
   this.mesh.position.x = this.body.position.x;
   this.mesh.position.y = this.body.position.y;
+  this.mesh.position.z = 0;
   this.mesh.rotation.y = this.body.angle;
   this.pointLight.position.copy(this.mesh.position);
 };
@@ -109,6 +170,9 @@ Player.prototype.respawn = function() {
 };
 
 Player.prototype.update = function() {
+  if(!this.active) {
+    return;
+  }
   if(!this.innerModel && Player.innerModel) {
     this.innerModel = Player.innerModel.clone();
     this.innerModel.traverse(obj => {
@@ -131,6 +195,7 @@ Player.prototype.update = function() {
         const color = obj.material.color;
         obj.material = new THREE.MeshStandardMaterial({
           color: color,
+          roughnessMap: THREE.ImageUtils.loadTexture('res/metal.jpg'),
         });
       }
     });
@@ -153,8 +218,9 @@ Player.prototype.update = function() {
   }
   this.particleSystem.update();
   this.innerModel.material.emissiveIntensity = BEATPULSE * 2;
+  this.pointLight.intensity = 0.75 + BEATPULSE * 0.25;
 
-  let joycon = navigator.getGamepads()[JOYCONS[this.options.joycon.id]];
+  let joycon = navigator.getGamepads()[JOYCONS[this.controls.joycon.id]];
   if(!joycon) {
     joycon = {
       axes: 'something long that is subscriptable',
@@ -172,25 +238,25 @@ Player.prototype.update = function() {
     }, Math.PI / 2);
     const normalised = Matter.Vector.normalise(rotated);
 
-    if(KEYS[this.options.keys.left] || joycon.axes[9] == this.options.joycon.left || joycon.axes[9] == this.options.joycon.upleft || joycon.axes[9] == this.options.joycon.downleft) {
+    if(KEYS[this.controls.keyboard.left] || joycon.axes[9] == this.controls.joycon.left || joycon.axes[9] == this.controls.joycon.upleft || joycon.axes[9] == this.controls.joycon.downleft) {
       Matter.Body.applyForce(
         this.body,
         this.body.position,
         {x: -0.001, y: 0});
     }
-    if(KEYS[this.options.keys.right] || joycon.axes[9] == this.options.joycon.right || joycon.axes[9] == this.options.joycon.upright || joycon.axes[9] == this.options.joycon.downright) {
+    if(KEYS[this.controls.keyboard.right] || joycon.axes[9] == this.controls.joycon.right || joycon.axes[9] == this.controls.joycon.upright || joycon.axes[9] == this.controls.joycon.downright) {
       Matter.Body.applyForce(
         this.body,
         this.body.position,
         {x: 0.001, y: 0});
     }
-    if(KEYS[this.options.keys.up] || joycon.axes[9] == this.options.joycon.up || joycon.axes[9] == this.options.joycon.upleft || joycon.axes[9] == this.options.joycon.upright) {
+    if(KEYS[this.controls.keyboard.up] || joycon.axes[9] == this.controls.joycon.up || joycon.axes[9] == this.controls.joycon.upleft || joycon.axes[9] == this.controls.joycon.upright) {
       Matter.Body.applyForce(
         this.body,
         this.body.position,
-        {x: 0, y: -0.001});
+        {x: 0, y: -0.0012});
     }
-    if(KEYS[this.options.keys.down] || joycon.axes[9] == this.options.joycon.down || joycon.axes[9] == this.options.joycon.downleft || joycon.axes[9] == this.options.joycon.downright) {
+    if(KEYS[this.controls.keyboard.down] || joycon.axes[9] == this.controls.joycon.down || joycon.axes[9] == this.controls.joycon.downleft || joycon.axes[9] == this.controls.joycon.downright) {
       Matter.Body.applyForce(
         this.body,
         this.body.position,
@@ -217,7 +283,10 @@ Player.prototype.update = function() {
     }
     this.updateRope();
   } else {
-    for(let anchor of [...this.game.anchors, this.game.player1, this.game.player2]) {
+    for(let anchor of [...this.game.anchors, ...this.game.players]) {
+      if(anchor.active === false) {
+        continue; 
+      }
       if(this == anchor) {
         continue;
       }
@@ -225,7 +294,7 @@ Player.prototype.update = function() {
           Matter.Vector.sub(
             this.body.position,
             anchor.body.position));
-      if(distanceSquared < 13000) {
+      if(distanceSquared < 16000) {
         this.currentAnchor = anchor;
 
         this.playConnectSound(this.currentAnchor.goal);
@@ -278,7 +347,7 @@ Player.prototype.update = function() {
   }
   this.spinster *= 0.9;
   this.mesh.rotation.z = this.spinster;
-  if(KEYS[this.options.keys.jump] || joycon.buttons[this.options.joycon.jump].pressed) {
+  if(KEYS[this.controls.keyboard.jump] || (joycon.buttons[this.controls.joycon.jump] && joycon.buttons[this.controls.joycon.jump].pressed)) {
     this.disconnectRope();
   }
 

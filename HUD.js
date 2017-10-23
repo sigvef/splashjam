@@ -67,38 +67,13 @@ HUD.prototype.render = function() {
     return;
   }
 
-  this.ctx.strokeStyle = 'rgba(255, 255, 255, .2)';
-  this.ctx.lineWidth = 4;
-  for(let i = 0; i < 10; i++) {
-    this.ctx.beginPath();
-    const x = 1920 / 2 + (i-4.5) * 100;
-    const y = 60;
-    this.ctx.arc(x, y, 30, 0, Math.PI * 2);
-    if(i < 5) {
-      const playerId = 0;
-      const color = new THREE.Color(this.game.players[playerId].options.color);
-      const style = `rgba(${color.r * 255 | 0}, ${color.g * 255 | 0}, ${color.b * 255 | 0}, 0.5`;
-      this.ctx.strokeStyle = style;
-      this.ctx.stroke();
-      if(4 - i - this.game.scores[playerId] < 0) {
-        this.ctx.fillStyle = `rgba(${2 * color.r * 255 | 0}, ${2 * color.g * 255 | 0}, ${2 * color.b * 255 | 0}, 0.8)`;
-        this.ctx.fill();
-      }
-    } else {
-      const playerId = 1;
-      const color = new THREE.Color(this.game.players[playerId].options.color);
-      const style = `rgba(${color.r * 255 | 0}, ${color.g * 255 | 0}, ${color.b * 255 | 0}, 0.5`;
-      this.ctx.strokeStyle = style;
-      this.ctx.stroke();
-      if(-i + 5 + this.game.scores[playerId] > 0) {
-        this.ctx.fillStyle = `rgba(${2 * color.r * 255 | 0}, ${2 * color.g * 255 | 0}, ${2 * color.b * 255 | 0}, 0.8)`;
-        this.ctx.fill();
-      }
-    }
-  }
-
+  this.game.players[0].renderHUD(this.ctx, true, true);
+  this.game.players[1].renderHUD(this.ctx, true, false);
+  this.game.players[2].renderHUD(this.ctx, false, true);
+  this.game.players[3].renderHUD(this.ctx, false, false);
+  return;
   this.ctx.font = '14pt Arial';
-  this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+  this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
   if(JOYCONS.left !== undefined) {
     this.ctx.fillText('Left joycon connected', 20, 1060);
   }
