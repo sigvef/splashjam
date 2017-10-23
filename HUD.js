@@ -71,16 +71,6 @@ HUD.prototype.render = function() {
   this.game.players[1].renderHUD(this.ctx, true, false);
   this.game.players[2].renderHUD(this.ctx, false, true);
   this.game.players[3].renderHUD(this.ctx, false, false);
-  return;
-  this.ctx.font = '14pt Arial';
-  this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-  if(JOYCONS.left !== undefined) {
-    this.ctx.fillText('Left joycon connected', 20, 1060);
-  }
-  if(JOYCONS.right !== undefined) {
-    this.ctx.textAlign = 'right';
-    this.ctx.fillText('Right joycon connected', 1900, 1060);
-  }
 };
 
 HUD.prototype.update = function() {

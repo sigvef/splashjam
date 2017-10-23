@@ -3,7 +3,7 @@ function GameState() {
 }
 
 CONTROLS = [{
-  name: 'wasd',
+  name: 'WASD + E [keyboard]',
   active: false,
   keyboard: {
     jump: 69,
@@ -15,7 +15,7 @@ CONTROLS = [{
   },
   joycon: {},
 }, {
-  name: 'left joycon',
+  name: 'Left Nintendo Joy-Con controller',
   active: false,
   keyboard: {},
   joycon: {
@@ -32,7 +32,7 @@ CONTROLS = [{
     boost: 0,
   },
 }, {
-  name: 'arrow keys',
+  name: 'Arrow keys + Space [keyboard]',
   active: false,
   keyboard: {
     jump: 32,
@@ -44,7 +44,7 @@ CONTROLS = [{
   },
   joycon: {},
 }, {
-  name: 'xbox 360 s game pad',
+  name: 'Xbox 360 S Gamepad',
   active: false,
   keyboard: {},
   gamepad: {
@@ -55,7 +55,7 @@ CONTROLS = [{
   },
   joycon: {},
 }, {
-  name: 'right joycon',
+  name: 'Right Nintendo Joy-Con controller',
   active: false,
   keyboard: {},
   joycon: {

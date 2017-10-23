@@ -80,7 +80,7 @@ function styleFromColor(color, alpha) {
 Player.prototype.renderHUD = function(ctx, up, rightAlign) {
   if(!this.active) {
     ctx.save();   
-    ctx.font = '20pt Arial';
+    ctx.font = '20pt monospace';
     ctx.fillStyle = styleFromColor(this.options.color, 0.1);
     ctx.textAlign = rightAlign ? 'right' : 'left';
     ctx.textBaseline = 'middle';
@@ -88,6 +88,11 @@ Player.prototype.renderHUD = function(ctx, up, rightAlign) {
     ctx.restore();
   } else {
     ctx.save();
+    ctx.font = '16pt monospace';
+    ctx.fillStyle = styleFromColor(this.options.color, 0.2);
+    ctx.textAlign = rightAlign ? 'left' : 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(this.controls.name, (!rightAlign ?  1920 - 30 : 30), up ? 30 : 1080 - 30);
     ctx.lineWidth = 4;
     for(let i = 0; i < 5; i++) {
       ctx.beginPath();
