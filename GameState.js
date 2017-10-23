@@ -287,14 +287,15 @@ GameState.prototype.score = function(playerId) {
     const angle = Math.random() * Math.PI * 2;
     const dx = Math.sin(angle);
     const dy = Math.cos(angle);
-    this.goalParticleSystem.spawn({
-      x: this.currentGoal.body.position.x,
-      y: this.currentGoal.body.position.y,
+    const magnitude = (Math.random() - 0.5) * 20;
+    this.players[playerId].particleSystem.spawn({
+      x: this.currentGoal.body.position.x + dx * magnitude,
+      y: this.currentGoal.body.position.y + dy * magnitude,
       z: 0,
     }, {
       x: dx * 10,
       y: dy * 10,
-      z: (Math.random() - 0.5) * 10,
+      z: (Math.random() - 0.5),
     });
   }
   this.camera.position.z *= 0.98; 
