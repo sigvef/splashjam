@@ -217,22 +217,8 @@ GameState.prototype.init = function() {
 
   this.anchors = [];
   for(let i = 0; i < this.anchorPositions.length; i++) {
-    const anchor = {
-      mesh: new THREE.Object3D(),
-    };
-    anchor.mesh.rotation.x = Math.PI / 2;
-    anchor.mesh.position.x = this.anchorPositions[i].x;
-    anchor.mesh.position.y = this.anchorPositions[i].y;
+    const anchor = new Anchor(this, this.anchorPositions[i]);
     this.anchors.push(anchor);
-    this.scene.add(anchor.mesh);
-    anchor.body = Matter.Bodies.circle(
-      anchor.mesh.position.x,
-      anchor.mesh.position.y,
-      10,
-      {isStatic: true});
-    anchor.owner = 'neutral';
-    anchor.body.restitution = 1;
-    Matter.World.add(this.matterEngine.world, anchor.body);
   }
 
   this.hud = new HUD(this);
@@ -319,7 +305,7 @@ GameState.prototype.score = function(playerId) {
 
 GameState.prototype.spawnGoal = function() {
   let nextAnchorCandidates = [];
-  for (let i = 2; i < this.anchors.length; i++) {
+  for (let i = 0; i < this.anchors.length; i++) {
     const anchor = this.anchors[i];
     if (!anchor.goal) {
       let allowed = true;
@@ -338,82 +324,20 @@ GameState.prototype.spawnGoal = function() {
     }
   }
   for(let anchor of this.anchors) {
-    anchor.goal = false;
-    anchor.mesh.remove(anchor.GoldenSymbolModel);
-    if(anchor.GoldenSymbolModel) {
-      anchor.GoldenSymbolModel.targetStartPosition.copy(anchor.GoldenSymbolModel.position);
-      anchor.GoldenSymbolModel.targetPosition.y = 0;
-      anchor.GoldenSymbolModel.targetPosition.tStart = +new Date();
-      anchor.GoldenSymbolModel.targetPosition.tLength = 200;
-    }
+    anchor.removeAsGoal();
   }
 
   let candidateIndex = Math.random() * nextAnchorCandidates.length | 0;
   const anchor = nextAnchorCandidates[candidateIndex];
-  anchor.goal = true;
+  anchor.setAsGoal();
   this.currentGoal = anchor;
-  anchor.mesh.add(anchor.GoldenSymbolModel);
-  if(anchor.GoldenSymbolModel) {
-    anchor.GoldenSymbolModel.targetStartPosition.copy(anchor.GoldenSymbolModel.position);
-    anchor.GoldenSymbolModel.targetPosition.y = -75;
-    anchor.GoldenSymbolModel.targetPosition.tStart = +new Date();
-    anchor.GoldenSymbolModel.targetPosition.tLength = 200;
-  }
 };
 
 GameState.prototype.render = function(renderer) {
   this.bloompass.intensity = 2 + BEATPULSE;
   this.goalParticleSystem.render();
   for(let anchor of this.anchors) {
-    if(anchor.goal && anchor.Hexagon1Model) {
-      anchor.Hexagon1Model.material.emissiveIntensityTarget = 10;
-      this.goalLight.position.copy(anchor.mesh.position);
-    } else if (anchor.Hexagon1Model) {
-      anchor.Hexagon1Model.material.emissiveIntensityTarget = 0;
-    }
-    if(anchor.goal && anchor.Hexagon2Model) {
-      anchor.Hexagon2Model.material.emissiveIntensityTarget = 10;
-    } else if (anchor.Hexagon1Model) {
-      anchor.Hexagon2Model.material.emissiveIntensityTarget = 0;
-    }
-    if(anchor.goal && anchor.GoldenSymbolModel) {
-      anchor.GoldenSymbolModel.material.emissiveIntensityTarget = 3;
-    } else if (anchor.GoldenSymbolModel) {
-      anchor.GoldenSymbolModel.material.emissiveIntensityTarget = 0;
-    }
-
-    if(anchor.Hexagon1Model) {
-      anchor.Hexagon1Model.material.emissiveIntensity = (
-          anchor.Hexagon1Model.material.emissiveIntensity * 0.95 + anchor.Hexagon1Model.material.emissiveIntensityTarget * 0.05);
-      anchor.Hexagon1Model.material.color = new THREE.Color(
-          lerp(anchor.Hexagon1Model.material.originalColorA.r,
-               anchor.Hexagon1Model.material.originalColorB.r,
-               anchor.Hexagon1Model.material.emissiveIntensity),
-          lerp(anchor.Hexagon1Model.material.originalColorA.g,
-               anchor.Hexagon1Model.material.originalColorB.g,
-               anchor.Hexagon1Model.material.emissiveIntensity),
-          lerp(anchor.Hexagon1Model.material.originalColorA.b,
-               anchor.Hexagon1Model.material.originalColorB.b,
-               anchor.Hexagon1Model.material.emissiveIntensity));
-    }
-    if(anchor.Hexagon2Model) {
-      anchor.Hexagon2Model.material.emissiveIntensity = (
-          anchor.Hexagon2Model.material.emissiveIntensity * 0.95 + anchor.Hexagon2Model.material.emissiveIntensityTarget * 0.05);
-      anchor.Hexagon2Model.material.color = new THREE.Color(
-          lerp(anchor.Hexagon2Model.material.originalColorA.r,
-               anchor.Hexagon2Model.material.originalColorB.r,
-               anchor.Hexagon2Model.material.emissiveIntensity),
-          lerp(anchor.Hexagon2Model.material.originalColorA.g,
-               anchor.Hexagon2Model.material.originalColorB.g,
-               anchor.Hexagon2Model.material.emissiveIntensity),
-          lerp(anchor.Hexagon2Model.material.originalColorA.b,
-               anchor.Hexagon2Model.material.originalColorB.b,
-               anchor.Hexagon2Model.material.emissiveIntensity));
-    }
-    if(anchor.GoldenSymbolModel) {
-      anchor.GoldenSymbolModel.material.emissiveIntensity = (
-          anchor.GoldenSymbolModel.material.emissiveIntensity * 0.95 + anchor.GoldenSymbolModel.material.emissiveIntensityTarget * 0.05);
-    }
+    anchor.render();
   }
 
   for(let player of this.players) {
@@ -421,39 +345,6 @@ GameState.prototype.render = function(renderer) {
   }
   this.hud.render();
 
-  /*
-  if(this.introTimer < 200 && this.introTimer > 0) {
-    this.player1.mesh.position.x = this.camera.position.x - 80;
-    this.player1.mesh.position.y = this.camera.position.y;
-    this.player1.mesh.position.z = this.camera.position.z + 400;
-    this.player1.mesh.rotation.x += 0.02;
-    this.player1.mesh.rotation.y += 0.01;
-    this.player1.mesh.rotation.z = 1;
-  }
-  if(this.introTimer >= 200 && this.introTimer < 400) {
-    this.player2.mesh.position.x = this.camera.position.x + 80;
-    this.player2.mesh.position.y = this.camera.position.y;
-    this.player2.mesh.position.z = this.camera.position.z + 400;
-    this.player2.mesh.rotation.x += 0.02;
-    this.player2.mesh.rotation.y += 0.01;
-    this.player2.mesh.rotation.z = -1;
-  }
-  if(this.introTimer == 1) {
-    this.player1.mesh.position.x = 0;
-    this.player1.mesh.position.y = 0;
-    this.player1.mesh.position.z = 0;
-    this.player2.mesh.position.x = 0;
-    this.player2.mesh.position.y = 0;
-    this.player2.mesh.position.z = 0;
-    this.player1.mesh.rotation.x = Math.PI / 2;
-    this.player1.mesh.rotation.y = 0;
-    this.player1.mesh.rotation.z = 0;
-    this.player2.mesh.rotation.x = Math.PI / 2;
-    this.player2.mesh.rotation.y = 0;
-    this.player2.mesh.rotation.z = 0;
-    this.camera.position.z = -1500;
-  }
-  */
   if(this.winner !== undefined) {
     this.players[this.winner].mesh.position.x = this.camera.position.x;
     this.players[this.winner].mesh.position.y = this.camera.position.y;
@@ -764,110 +655,7 @@ GameState.prototype.update = function() {
   this.camera.position.z = this.camera.position.z - (this.camera.position.z - this.cameraTarget.z) / 128;
 
   for(let anchor of this.anchors) {
-
-    if(anchor.goal) {
-      goalAnchor = anchor;
-      const angle = Math.random() * Math.PI * 2;
-      const dx = Math.sin(angle) * 20;
-      const dy = Math.cos(angle) * 20;
-      if(anchor.GoldenSymbolModel) {
-        /* z and y are swapped since GoldenSymbolModel is rotated inside mesh */
-        this.goalParticleSystem.spawn({
-          x: anchor.mesh.position.x + anchor.GoldenSymbolModel.position.x + dx,
-          y: anchor.mesh.position.y + anchor.GoldenSymbolModel.position.z + dy,
-          z: anchor.mesh.position.z + anchor.GoldenSymbolModel.position.y
-        }, {
-          x: 0,
-          y: 0,
-          z: 10
-        });
-      }
-    }
-
-    if(!anchor.GoldenSymbolModel && GameState.GoldenSymbolModel) {
-      const model = GameState.GoldenSymbolModel.clone();
-      anchor.GoldenSymbolModel = model;
-      anchor.GoldenSymbolModel.targetStartPosition = anchor.GoldenSymbolModel.position.clone();
-      anchor.GoldenSymbolModel.targetPosition = anchor.GoldenSymbolModel.position.clone();
-      anchor.GoldenSymbolModel.targetPosition.tStart = +new Date();
-      anchor.GoldenSymbolModel.targetPosition.tLength = 1;
-      anchor.GoldenSymbolModel.traverse(obj => {
-        if(obj.material) {
-          const color = obj.material.color;
-          obj.material = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-          });
-          obj.material.emissiveIntensityTarget = 0;
-          obj.material.emissiveIntensity = 0;
-          anchor.GoldenSymbolModel.material = obj.material;
-        }
-      });
-      anchor.mesh.add(model);
-    }
-    if(!anchor.Hexagon1Model && GameState.Hexagon1Model) {
-      const model = GameState.Hexagon1Model.clone();
-      anchor.Hexagon1Model = model;
-      anchor.Hexagon1Model.traverse(obj => {
-        if(obj.material) {
-          const color = obj.material.color;
-          obj.material = new THREE.MeshBasicMaterial({
-            color: color,
-          });
-          obj.material.originalColorA = new THREE.Color(0x888888);
-          obj.material.originalColorB = new THREE.Color(0xA02DD2);
-          obj.material.emissiveIntensityTarget = 0;
-          obj.material.emissiveIntensity = 0;
-          anchor.Hexagon1Model.material = obj.material;
-        }
-      });
-      anchor.mesh.add(model);
-    }
-    if(!anchor.Hexagon2Model && GameState.Hexagon2Model) {
-      const model = GameState.Hexagon2Model.clone();
-      anchor.Hexagon2Model = model;
-      anchor.Hexagon2Model.traverse(obj => {
-        if(obj.material) {
-          const color = obj.material.color;
-          obj.material = new THREE.MeshBasicMaterial({
-            color: color,
-          });
-          obj.material.originalColorA = new THREE.Color(0x888888);
-          obj.material.originalColorB = new THREE.Color(0xff44ff);
-          obj.material.emissiveIntensityTarget = 0;
-          obj.material.emissiveIntensity = 0;
-          anchor.Hexagon2Model.material = obj.material;
-        }
-      });
-      anchor.mesh.add(model);
-    }
-
-    if(anchor.GoldenSymbolModel) {
-      const step = (+new Date() - anchor.GoldenSymbolModel.targetPosition.tStart) / anchor.GoldenSymbolModel.targetPosition.tLength;
-      anchor.GoldenSymbolModel.position.x = smoothstep(anchor.GoldenSymbolModel.targetStartPosition.x, anchor.GoldenSymbolModel.targetPosition.x, step);
-      anchor.GoldenSymbolModel.position.y = smoothstep(anchor.GoldenSymbolModel.targetStartPosition.y, anchor.GoldenSymbolModel.targetPosition.y, step);
-      anchor.GoldenSymbolModel.position.z = smoothstep(anchor.GoldenSymbolModel.targetStartPosition.z, anchor.GoldenSymbolModel.targetPosition.z, step);
-    }
-
-    if(anchor.Hexagon1Model) {
-      //anchor.Hexagon1Model.rotation.y += 0.01;
-      if(anchor.goal) {
-        anchor.Hexagon1Model.rotation.y += 0.02;
-      }
-    }
-    if(anchor.Hexagon2Model) {
-      anchor.Hexagon2Model.scale.set(0.0001, 0.0001, 0.0001);
-      if(anchor.goal) {
-        anchor.Hexagon2Model.rotation.y -= 0.02;
-      anchor.Hexagon2Model.scale.set(17.5, 17.5, 17.5);
-      }
-    }
-    if(anchor.GoldenSymbolModel) {
-      if(anchor.goal) {
-        anchor.GoldenSymbolModel.rotation.y =  0.2 * PULSE;
-      }
-      anchor.GoldenSymbolModel.rotation.x =  0.2 * Math.sin(+new Date() /500);
-      anchor.GoldenSymbolModel.rotation.z =  0.2 * Math.cos(+new Date() /500);
-    }
+    anchor.update();
   }
 
   this.goalParticleSystem.update();

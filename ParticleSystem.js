@@ -1,7 +1,7 @@
 function ParticleSystem(game, options) {
   this.game = game;
   this.options = options;
-  var amount = 10000;
+  var amount = 1000;
   var positions = new Float32Array(amount * 3);
   this.velocities = new Float32Array(amount * 3);
   var colors = new Float32Array(amount * 3);
