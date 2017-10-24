@@ -231,6 +231,7 @@ GameState.prototype.init = function() {
       10,
       {isStatic: true});
     anchor.owner = 'neutral';
+    anchor.body.restitution = 1;
     Matter.World.add(this.matterEngine.world, anchor.body);
   }
 

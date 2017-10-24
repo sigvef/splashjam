@@ -10,6 +10,7 @@ function Player(game, options) {
   this.lightningMaterial = makeLightningMaterial();
   this.body = Matter.Bodies.circle(
       0, 0, 10, { density: 0.004, frictionAir: 0.005});
+  this.body.restitution = 1;
   Matter.Body.setPosition(this.body, this.options.position);
   this.currentAnchor = undefined;
   this.lastAnchor = null;
