@@ -71,11 +71,17 @@ function loop() {
     if(!gamepad) {
       continue;
     }
-    if(gamepad.id == 'Wireless Gamepad (Vendor: 057e Product: 2006)') {
+    if(gamepad.id === 'Wireless Gamepad (Vendor: 057e Product: 2006)') {
       JOYCONS.left = gamepad.index;
     }
-    if(gamepad.id == 'Wireless Gamepad (Vendor: 057e Product: 2007)') {
+    if(gamepad.id === 'Wireless Gamepad (Vendor: 057e Product: 2007)') {
       JOYCONS.right = gamepad.index;
+    }
+    if(gamepad.id === 'Joy-Con (R) (Vendor:057e Product: 2007') {
+      JOYCONS.right = gamepad.index;
+    }
+    if(gamepad.id === 'Joy-Con (L) (Vendor: 057e Product: 2006)') {
+      JOYCONS.left = gamepad.index;
     }
   }
   while (dt > 20) {

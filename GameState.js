@@ -307,7 +307,7 @@ GameState.prototype.score = function(playerId) {
     SoundManager.playSound('win');
     setTimeout(() => {
       this.winner = playerId;
-    }, 1000);
+    }, 300);
     setTimeout(() => {
       this.reset();
     }, 4000)
