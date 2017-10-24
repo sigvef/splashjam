@@ -184,6 +184,13 @@ Player.prototype.updateRope = function() {
 };
 
 Player.prototype.respawn = function() {
+  if(this.active) {
+    gtag('event', 'respawn', {
+      player_id: this.options.id,
+      scores: this.game.scores,
+      controls: this.controls.name,
+    });
+  }
   Matter.Body.setPosition(this.body, this.options.position);
   Matter.Body.setVelocity(this.body, {x: 0, y: 0});
   Matter.Body.setAngle(this.body, 0);

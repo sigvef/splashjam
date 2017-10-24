@@ -97,6 +97,7 @@ GameState.prototype.init = function() {
 
   this.introTimer = 0;
   this.winner = undefined;
+  this.startTime = +new Date();
 
   this.scene = new THREE.Scene();
   this.camera = new THREE.Camera();
@@ -239,6 +240,8 @@ GameState.prototype.pause = function() {
 };
 
 GameState.prototype.reset = function() {
+  gtag('event', 'reset');
+  this.startTime = +new Date();
   this.introTimer = 4;
   this.winner = undefined;
   for(let i in this.scores) {
@@ -293,6 +296,16 @@ GameState.prototype.score = function(playerId) {
     SoundManager.playSound('win');
     setTimeout(() => {
       this.winner = playerId;
+      let number_of_players = 0;
+      for(let i = 0; i < this.players.length; i++) {
+        number_of_players++;
+      }
+      gtag('event', 'winner', {
+        player_id: playerId,
+        scores: this.scores,
+        number_of_players,
+        game_time: +new Date() - this.game_time,
+      });
     }, 300);
     setTimeout(() => {
       this.reset();
@@ -331,6 +344,7 @@ GameState.prototype.spawnGoal = function() {
   const anchor = nextAnchorCandidates[candidateIndex];
   anchor.setAsGoal();
   this.currentGoal = anchor;
+  gtag('event', 'spawn_goal');
 };
 
 GameState.prototype.render = function(renderer) {
@@ -361,10 +375,15 @@ GameState.prototype.render = function(renderer) {
 };
 
 GameState.prototype.activateNextPlayer = function(controls) {
-  for(let player of this.players) {
+  for(let i in this.players) {
+    const player = this.players[i];
     if(!player.active) {
       controls.active = true;
       player.activate(controls);
+      gtag('event', 'activate', {
+        'controls': controls.name,
+        'number_of_players': i + 1,
+      });
       return;
     }
   }
