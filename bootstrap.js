@@ -10,6 +10,8 @@ FPS = 60;
 missedGFXFrames = 0;
 
 
+const FPSMeasurements = {frame: 0, startTime: +new Date()};
+
 function clamp(lower, upper, value) {
   value = Math.min(upper, value);
   value = Math.max(lower, value);
@@ -91,6 +93,7 @@ function loop() {
   /* clearing canvas */
   canvas.width = canvas.width;
   sm.render(renderer);
+  FPSMeasurements.frame++;
 
 
   requestAnimFrame(loop);
@@ -149,6 +152,17 @@ function bootstrap() {
 
   loaded--;
   requestAnimFrame(loop);
+
+  setInterval(() => {
+    const frames = FPSMeasurements.frame;
+    const time = +new Date() - FPSMeasurements.startTime;
+    const fps = (frames / time / 1000 + 0.5) | 0;
+    gtag('event', 'fps', {
+      fps: fps,
+    });
+    FPSMeasurements.frame = 0;
+    FPSMeasurements.startTime = +new Date();
+  }, 1000 * 60);
 }
 
 function resize(e) {

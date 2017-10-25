@@ -195,6 +195,7 @@ Player.prototype.respawn = function() {
   Matter.Body.setVelocity(this.body, {x: 0, y: 0});
   Matter.Body.setAngle(this.body, 0);
   Matter.Body.setAngularVelocity(this.body, 0);
+  this.mesh.rotation.set(Math.PI / 2, 0, 0);
   this.game.scores[this.options.id] = Math.max(0, this.game.scores[this.options.id] - 1);
   this.disconnectRope();
   for (let player of this.game.players) {
