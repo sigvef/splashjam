@@ -316,6 +316,9 @@ GameState.prototype.resume = function(gameMode) {
 };
 
 GameState.prototype.score = function(playerId) {
+  if(this.winner !== undefined) {
+    return;
+  }
   for(let i = 0; i < 1000; i++) {
     const angle = Math.random() * Math.PI * 2;
     const dx = Math.sin(angle);
