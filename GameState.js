@@ -262,7 +262,7 @@ GameState.prototype.reset = function() {
   }
   for(let player of this.players) {
     player.reset(); 
-    player.respawn(); 
+    player.respawn(false);
   }
   this.spawnGoal();
 };

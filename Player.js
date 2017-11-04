@@ -187,7 +187,7 @@ Player.prototype.updateRope = function() {
   this.ropeMesh.rotation.z = angle + (Math.random() - 0.5) * 0.2;
 };
 
-Player.prototype.respawn = function() {
+Player.prototype.respawn = function(playDeathSound = true) {
   if(this.active) {
     gtag('event', 'respawn', {
       player_id: this.options.id,
@@ -211,7 +211,9 @@ Player.prototype.respawn = function() {
     return;
   }
   this.game.scores[this.options.id] = Math.max(0, this.game.scores[this.options.id] - 1);
-  this.playRespawnSound();
+  if (playDeathSound) {
+    this.playRespawnSound();
+  }
 };
 
 Player.prototype.update = function() {
