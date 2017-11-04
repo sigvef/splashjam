@@ -3,6 +3,7 @@ function Player(game, options) {
 
   this.options = options;
   this.active = false;
+  this.aiController = null;
   this.game = game;
   this.spinster = 0;
   this.innerModel = undefined;
@@ -117,6 +118,9 @@ Player.prototype.renderHUD = function(ctx, up, rightAlign) {
 
 Player.prototype.activate = function(controls) {
   this.controls = controls;
+  if (controls.ai) {
+    this.aiController = new AiController(this);
+  }
   this.active = true;
   Matter.World.add(this.game.matterEngine.world, this.body);
   this.mesh.visible = true;
@@ -267,6 +271,9 @@ Player.prototype.update = function() {
       buttons: 'something long that is subscriptable',
     };
   }
+  if (this.aiController) {
+    this.aiController.update();
+  }
 
   if(this.currentAnchor) {
     const forceMultiplier = 0.00005;
@@ -278,25 +285,54 @@ Player.prototype.update = function() {
     }, Math.PI / 2);
     const normalised = Matter.Vector.normalise(rotated);
 
-    if(KEYS[this.controls.keyboard.left] || joycon.axes[9] == this.controls.joycon.left || joycon.axes[9] == this.controls.joycon.upleft || joycon.axes[9] == this.controls.joycon.downleft) {
+    const left = (
+      KEYS[this.controls.keyboard.left] ||
+      joycon.axes[9] == this.controls.joycon.left ||
+      joycon.axes[9] == this.controls.joycon.upleft ||
+      joycon.axes[9] == this.controls.joycon.downleft ||
+      (this.aiController && this.aiController.controls.left)
+    );
+    const right = (
+      KEYS[this.controls.keyboard.right] ||
+      joycon.axes[9] == this.controls.joycon.right ||
+      joycon.axes[9] == this.controls.joycon.upright ||
+      joycon.axes[9] == this.controls.joycon.downright ||
+      (this.aiController && this.aiController.controls.right)
+    );
+    const up = (
+      KEYS[this.controls.keyboard.up] ||
+      joycon.axes[9] == this.controls.joycon.up ||
+      joycon.axes[9] == this.controls.joycon.upleft ||
+      joycon.axes[9] == this.controls.joycon.upright ||
+      (this.aiController && this.aiController.controls.up)
+    );
+    const down = (
+      KEYS[this.controls.keyboard.down] ||
+      joycon.axes[9] == this.controls.joycon.down ||
+      joycon.axes[9] == this.controls.joycon.downleft ||
+      joycon.axes[9] == this.controls.joycon.downright ||
+      (this.aiController && this.aiController.controls.down)
+    );
+
+    if (left) {
       Matter.Body.applyForce(
         this.body,
         this.body.position,
         {x: -0.001, y: 0});
     }
-    if(KEYS[this.controls.keyboard.right] || joycon.axes[9] == this.controls.joycon.right || joycon.axes[9] == this.controls.joycon.upright || joycon.axes[9] == this.controls.joycon.downright) {
+    if (right) {
       Matter.Body.applyForce(
         this.body,
         this.body.position,
         {x: 0.001, y: 0});
     }
-    if(KEYS[this.controls.keyboard.up] || joycon.axes[9] == this.controls.joycon.up || joycon.axes[9] == this.controls.joycon.upleft || joycon.axes[9] == this.controls.joycon.upright) {
+    if (up) {
       Matter.Body.applyForce(
         this.body,
         this.body.position,
         {x: 0, y: -0.0012});
     }
-    if(KEYS[this.controls.keyboard.down] || joycon.axes[9] == this.controls.joycon.down || joycon.axes[9] == this.controls.joycon.downleft || joycon.axes[9] == this.controls.joycon.downright) {
+    if (down) {
       Matter.Body.applyForce(
         this.body,
         this.body.position,
@@ -387,7 +423,13 @@ Player.prototype.update = function() {
   }
   this.spinster *= 0.9;
   this.mesh.rotation.z = this.spinster;
-  if(KEYS[this.controls.keyboard.jump] || (joycon.buttons[this.controls.joycon.jump] && joycon.buttons[this.controls.joycon.jump].pressed)) {
+
+  const jump = (
+    KEYS[this.controls.keyboard.jump] ||
+    (joycon.buttons[this.controls.joycon.jump] && joycon.buttons[this.controls.joycon.jump].pressed) ||
+    (this.aiController && this.aiController.controls.jump)
+  );
+  if(jump) {
     this.disconnectRope();
   }
 

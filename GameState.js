@@ -2,96 +2,107 @@
 function GameState() {
 }
 
-CONTROLS = [{
-  name: 'IJKL + O [keyboard]',
-  active: false,
-  keyboard: {
-    jump: 79,
-    up: 73,
-    down: 75,
-    left: 74,
-    right: 76,
+CONTROLS = [
+  {
+    name: 'IJKL + O [keyboard]',
+    active: false,
+    keyboard: {
+      jump: 79,
+      up: 73,
+      down: 75,
+      left: 74,
+      right: 76,
+    },
+    joycon: {},
+  }, {
+    name: 'TFGH + Y [keyboard]',
+    active: false,
+    keyboard: {
+      jump: 89,
+      up: 84,
+      down: 71,
+      left: 70,
+      right: 72,
+    },
+    joycon: {},
+  }, {
+    name: 'WASD + E [keyboard]',
+    active: false,
+    keyboard: {
+      jump: 69,
+      up: 87,
+      down: 83,
+      left: 65,
+      right: 68,
+    },
+    joycon: {},
+  }, {
+    name: 'Left Nintendo Joy-Con controller',
+    active: false,
+    keyboard: {},
+    joycon: {
+      id: 'left',
+      up: -1,
+      upright: -0.7142857313156128,
+      right: -0.4285714030265808,
+      downright: -0.1428571343421936,
+      down: 0.14285719394683838,
+      downleft: 0.4285714626312256,
+      left: 0.7142857313156128,
+      upleft: 1,
+      jump: 1,
+      boost: 0,
+    },
+  }, {
+    name: 'Arrow keys + Space [keyboard]',
+    active: false,
+    keyboard: {
+      jump: 32,
+      up: 38,
+      down: 40,
+      left: 37,
+      right: 39,
+    },
+    joycon: {},
+  }, {
+    name: 'Xbox 360 S Gamepad',
+    active: false,
+    keyboard: {},
+    gamepad: {
+      jump: 1,
+      jump2: 5,
+      leftright: 2,
+      updown: 3,
+    },
+    joycon: {},
+  }, {
+    name: 'Right Nintendo Joy-Con controller',
+    active: false,
+    keyboard: {},
+    joycon: {
+      id: 'right',
+      up: -1,
+      upright: -0.7142857313156128,
+      right: -0.4285714030265808,
+      downright: -0.1428571343421936,
+      down: 0.14285719394683838,
+      downleft: 0.4285714626312256,
+      left: 0.7142857313156128,
+      upleft: 1,
+      jump: 1,
+      boost: 0,
+    },
   },
-  joycon: {},
-}, {
-  name: 'TFGH + Y [keyboard]',
-  active: false,
-  keyboard: {
-    jump: 89,
-    up: 84,
-    down: 71,
-    left: 70,
-    right: 72,
-  },
-  joycon: {},
-}, {
-  name: 'WASD + E [keyboard]',
-  active: false,
-  keyboard: {
-    jump: 69,
-    up: 87,
-    down: 83,
-    left: 65,
-    right: 68,
-  },
-  joycon: {},
-}, {
-  name: 'Left Nintendo Joy-Con controller',
-  active: false,
-  keyboard: {},
-  joycon: {
-    id: 'left',
-    up: -1,
-    upright: -0.7142857313156128,
-    right: -0.4285714030265808,
-    downright: -0.1428571343421936,
-    down: 0.14285719394683838,
-    downleft: 0.4285714626312256,
-    left: 0.7142857313156128,
-    upleft: 1,
-    jump: 1,
-    boost: 0,
-  },
-}, {
-  name: 'Arrow keys + Space [keyboard]',
-  active: false,
-  keyboard: {
-    jump: 32,
-    up: 38,
-    down: 40,
-    left: 37,
-    right: 39,
-  },
-  joycon: {},
-}, {
-  name: 'Xbox 360 S Gamepad',
-  active: false,
-  keyboard: {},
-  gamepad: {
-    jump: 1,
-    jump2: 5,
-    leftright: 2,
-    updown: 3,
-  },
-  joycon: {},
-}, {
-  name: 'Right Nintendo Joy-Con controller',
-  active: false,
-  keyboard: {},
-  joycon: {
-    id: 'right',
-    up: -1,
-    upright: -0.7142857313156128,
-    right: -0.4285714030265808,
-    downright: -0.1428571343421936,
-    down: 0.14285719394683838,
-    downleft: 0.4285714626312256,
-    left: 0.7142857313156128,
-    upleft: 1,
-    jump: 1,
-    boost: 0,
-  },
-}];
+  {
+    name: 'AI',
+    active: false,
+    keyboard: {
+      activate: 88
+    },
+    joycon: {},
+    ai: true
+  }
+];
 
 GameState.prototype.init = function() {
 
