@@ -41,7 +41,7 @@ ParticleSystem.prototype.spawn = function(position, velocity) {
   this.velocities[this.index * 3 + 1] = velocity.y;
   this.velocities[this.index * 3 + 2] = velocity.z;
   this.particleGeometry.attributes.size.array[this.index] = 200;
-}
+};
 
 ParticleSystem.prototype.update = function() {
   const attributes = this.particleGeometry.attributes;
@@ -52,7 +52,7 @@ ParticleSystem.prototype.update = function() {
     attributes.position.array[i * 3 + 2] += this.velocities[i * 3 + 2];
   }
   attributes.size.needsUpdate = true;
-}
+};
 
 ParticleSystem.prototype.render = function() {
   this.particleGeometry.attributes.size.needsUpdate = true;
