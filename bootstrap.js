@@ -52,6 +52,23 @@ window.requestAnimFrame = (function() {
     };
 })();
 
+function relativeMouseCoords(e, canvas) {
+  let currentElement = canvas;
+  let totalOffsetX = 0;
+  let totalOffsetY = 0;
+
+  do {
+    totalOffsetX += currentElement.offsetLeft;
+    totalOffsetY += currentElement.offsetTop;
+  }
+  while (currentElement = currentElement.offsetParent);
+
+  const canvasX = (e.pageX || (e.touches && e.touches[0] && e.touches[0].pageX)) - totalOffsetX;
+  const canvasY = (e.pageY || (e.touches && e.touches[0] && e.touches[0].pageY)) - totalOffsetY;
+
+  return {x: canvasX, y: canvasY}
+}
+
 function loop() {
   if (loaded > 0) {
     canvas.width = canvas.width;

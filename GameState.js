@@ -143,6 +143,8 @@ GameState.prototype.init = function() {
   this.bglayer3.position.z = 400;
   this.bglayer4.position.z = 200;
 
+  this.gameMode = null;  // is set by resume()
+
   this.players = [
     new Player(this, {
       id: 0,
@@ -265,7 +267,20 @@ GameState.prototype.reset = function() {
   this.spawnGoal();
 };
 
-GameState.prototype.resume = function() {
+GameState.prototype.resume = function(gameMode) {
+  /**
+   * gameMode: '1-player' or 'multiplayer'
+   */
+
+  this.gameMode = gameMode;
+  if (this.gameMode === '1-player') {
+    for (let control of CONTROLS) {
+      if (control.name.indexOf('Arrow keys') !== -1 || control.ai) {
+        this.activateNextPlayer(control);
+      }
+    }
+  }
+
   composer.passes = [];
   composer.addPass(new POSTPROCESSING.RenderPass(this.scene, this.camera));
   composer.addPass(new POSTPROCESSING.FilmPass({
@@ -651,7 +666,6 @@ GameState.prototype.update = function() {
     });
     this.bglayer4.add(model);
   }
-
 
   this.bglayer0.rotation.z += 0.01 * BEATPULSE * BEATPULSE + 0.002;
   this.bglayer1.rotation.z -= 0.01 * BEATPULSE * BEATPULSE + 0.002;

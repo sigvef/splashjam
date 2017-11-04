@@ -91,7 +91,7 @@ Player.prototype.renderHUD = function(ctx, up, rightAlign) {
   } else {
     ctx.save();
     ctx.font = '16pt monospace';
-    ctx.fillStyle = styleFromColor(this.options.color, 0.2);
+    ctx.fillStyle = styleFromColor(this.options.color, 0.5);
     ctx.textAlign = rightAlign ? 'left' : 'right';
     ctx.textBaseline = 'middle';
     ctx.fillText(this.controls.name, (!rightAlign ?  1920 - 30 : 30), up ? 30 : 1080 - 30);
