@@ -274,13 +274,19 @@ GameState.prototype.resume = function(gameMode) {
 
   this.gameMode = gameMode;
   if (this.gameMode === '1-player') {
+    if (localStorage && !localStorage.getItem('hasVisited1PlayerBefore')) {
+      alert(
+        'Controls: Arrow keys + space bar. \n Press ok to start the game.'
+      );
+      localStorage.setItem('hasVisited1PlayerBefore', 'yep');
+    }
     for (let control of CONTROLS) {
       if (control.name.indexOf('Arrow keys') !== -1 || control.ai) {
         this.activateNextPlayer(control);
       }
     }
   } else {
-    if (localStorage && !localStorage.getItem('hasVisitedBefore')) {
+    if (localStorage && !localStorage.getItem('hasVisitedMultiplayerBefore')) {
       alert(
         'Keyboard players can join by pressing \n' +
         'Arrow keys, WASD, TFGH or IJKL. \n' +
@@ -288,7 +294,7 @@ GameState.prototype.resume = function(gameMode) {
         'Add an AI opponent by pressing \'x\' on the keyboard. \n' +
         'Enjoy!'
       );
-      localStorage.setItem('hasVisitedBefore', 'yep');
+      localStorage.setItem('hasVisitedMultiplayerBefore', 'yep');
     }
   }
 
