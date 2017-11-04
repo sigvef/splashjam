@@ -279,6 +279,17 @@ GameState.prototype.resume = function(gameMode) {
         this.activateNextPlayer(control);
       }
     }
+  } else {
+    if (localStorage && !localStorage.getItem('hasVisitedBefore')) {
+      alert(
+        'Keyboard players can join by pressing \n' +
+        'Arrow keys, WASD, TFGH or IJKL. \n' +
+        'Gamepad players can join by pressing any button. \n' +
+        'Add an AI opponent by pressing \'x\' on the keyboard. \n' +
+        'Enjoy!'
+      );
+      localStorage.setItem('hasVisitedBefore', 'yep');
+    }
   }
 
   composer.passes = [];
