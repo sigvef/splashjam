@@ -200,13 +200,17 @@ Player.prototype.respawn = function() {
   Matter.Body.setAngle(this.body, 0);
   Matter.Body.setAngularVelocity(this.body, 0);
   this.mesh.rotation.set(Math.PI / 2, 0, 0);
-  this.game.scores[this.options.id] = Math.max(0, this.game.scores[this.options.id] - 1);
   this.disconnectRope();
   for (let player of this.game.players) {
     if (player.currentAnchor === this) {
       player.disconnectRope();
     }
   }
+  if(this.game.winner !== undefined) {
+    // Don't alter the score or play the respawn sound if someone has already won
+    return;
+  }
+  this.game.scores[this.options.id] = Math.max(0, this.game.scores[this.options.id] - 1);
   this.playRespawnSound();
 };
 
