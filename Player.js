@@ -279,6 +279,12 @@ Player.prototype.update = function() {
     this.aiController.update();
   }
 
+  const jump = (
+    KEYS[this.controls.keyboard.jump] ||
+    (joycon.buttons[this.controls.joycon.jump] && joycon.buttons[this.controls.joycon.jump].pressed) ||
+    (this.aiController && this.aiController.controls.jump)
+  );
+
   if(this.currentAnchor) {
     const forceMultiplier = 0.00005;
     const p1 = this.currentAnchor.body.position;
@@ -362,7 +368,7 @@ Player.prototype.update = function() {
       this.currentAnchor.owner = this;
     }
     this.updateRope();
-  } else {
+  } else if (!jump) {
     for(let anchor of [...this.game.anchors, ...this.game.players]) {
       if(anchor.active === false) {
         continue; 
@@ -373,8 +379,10 @@ Player.prototype.update = function() {
       const distanceSquared = Matter.Vector.magnitudeSquared(
           Matter.Vector.sub(
             this.body.position,
-            anchor.body.position));
-      if(distanceSquared < 16000) {
+            anchor.body.position
+          )
+      );
+      if (distanceSquared < 16000) {
         this.currentAnchor = anchor;
 
         this.playConnectSound(this.currentAnchor.goal);
@@ -428,11 +436,6 @@ Player.prototype.update = function() {
   this.spinster *= 0.9;
   this.mesh.rotation.z = this.spinster;
 
-  const jump = (
-    KEYS[this.controls.keyboard.jump] ||
-    (joycon.buttons[this.controls.joycon.jump] && joycon.buttons[this.controls.joycon.jump].pressed) ||
-    (this.aiController && this.aiController.controls.jump)
-  );
   if(jump) {
     this.disconnectRope();
   }
