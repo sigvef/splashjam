@@ -136,7 +136,9 @@ Anchor.prototype.update = function() {
         this.GoldenSymbolModel.material = obj.material;
       }
     });
-    this.mesh.add(model);
+    if (this.goal) {
+      this.mesh.add(model);
+    }
   }
   if(!this.Hexagon1Model && GameState.Hexagon1Model) {
     const model = GameState.Hexagon1Model.clone();
