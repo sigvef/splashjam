@@ -21,8 +21,10 @@ function Player(game, options) {
     this.lightningMaterial);
 
   this.mesh = new THREE.Object3D();
+  this.grabIndicatorMesh = new THREE.Object3D();
   this.mesh.rotation.x = Math.PI / 2;
   this.game.scene.add(this.mesh);
+  this.game.scene.add(this.grabIndicatorMesh);
 
   const color = new THREE.Color(this.options.color);
   this.lightningMaterial.uniforms.r.value = color.r;
@@ -233,6 +235,19 @@ Player.prototype.update = function() {
   if(!this.active) {
     return;
   }
+  if(!this.grabIndicatorModel && Player.grabIndicatorModel) {
+    this.grabIndicatorModel = Player.grabIndicatorModel.clone();
+    this.grabIndicatorModel.traverse(obj => {
+      console.log('traversion', obj);
+      if(obj.material) {
+        obj.material = new THREE.MeshBasicMaterial({
+          color: new THREE.Color(this.options.color),
+        });
+        this.grabIndicatorModel.material = obj.material;
+      }
+    });
+    this.grabIndicatorMesh.add(this.grabIndicatorModel);
+  }
   if(!this.innerModel && Player.innerModel) {
     this.innerModel = Player.innerModel.clone();
     this.innerModel.traverse(obj => {
@@ -364,6 +379,33 @@ Player.prototype.update = function() {
         {x: 0, y: 0.001});
     }
 
+    const angle = Matter.Vector.angle(
+        Matter.Vector.sub(
+          this.currentAnchor.body.position,
+          this.body.position),
+        {x: 1, y: 0});
+
+    if(this.currentAnchor) {
+      this.grabIndicatorMesh.visible = true;
+      this.grabIndicatorMesh.position.copy(this.currentAnchor.mesh.position);
+      this.grabIndicatorMesh.rotation.z = angle - Math.PI / 2;
+    } else {
+      this.grabIndicatorMesh.visible = false;
+    }
+
+    this.grabRotationPrevious = this.grabRotationAmount;
+    let angleDelta = angle - (this.grabRotationPrevious % (Math.PI * 2));
+    if(angleDelta > Math.PI + 0.0000001) {
+      angleDelta -= Math.PI * 2;
+    }
+    if(angleDelta < -Math.PI - 0.00000001) {
+      angleDelta += Math.PI * 2;
+    }
+    this.grabRotationAmount += angleDelta;
+    this.currentAnchor.capturePercentage = Math.abs(this.grabRotationAmount) / Math.PI / 2;
+    if(this.currentAnchor.capturePercentage >= 1) {
+      this.currentAnchor.owner = this;
+    }
     this.updateRope();
   } else if (!jump) {
     for(let anchor of [...this.game.anchors, ...this.game.players]) {
@@ -388,6 +430,16 @@ Player.prototype.update = function() {
           this.spinster = Math.PI * 3;
         }
         this.lastAnchor = this.currentAnchor;
+
+
+        const angle = Matter.Vector.angle(
+            Matter.Vector.sub(
+              anchor.body.position,
+              this.body.position),
+            {x: 1, y: 0});
+
+        this.grabRotationPrevious = angle;
+        this.grabRotationAmount = 0;
         var group = Matter.Body.nextGroup(true);
         this.currentRope = Matter.Composites.stack(0, 0, 5, 1, 1, 1, (x, y) => {
           return Matter.Bodies.rectangle(
@@ -418,6 +470,7 @@ Player.prototype.update = function() {
         Matter.Composite.add(this.game.matterEngine.world,
                              this.currentRopeConstraintBall);
         this.game.scene.add(this.ropeMesh);
+        this.game.scene.add(this.grabIndicatorMesh);
         this.updateRope();
         break;
       }
@@ -451,6 +504,7 @@ Player.prototype.disconnectRope = function() {
                           this.currentRopeConstraintBall);
   this.currentAnchor = undefined;
   this.game.scene.remove(this.ropeMesh);
+  this.game.scene.remove(this.grabIndicatorMesh);
   this.playReleaseSound();
 };
 
@@ -465,4 +519,11 @@ loader.load('res/playerBall.fbx', object => {
 loader.load('res/PlayerColor.fbx', object => {
   Player.innerModel = object;
   object.scale.set(10, 10, 10);
+}, () => {console.log('progress')}, () => {console.log('onerror')});
+
+loader.load('res/grab_indicator.fbx', object => {
+  Player.grabIndicatorModel = object;
+  const scale = 0.04;
+  object.scale.set(scale, scale, scale);
+  object.rotation.x = Math.PI / 2;
 }, () => {console.log('progress')}, () => {console.log('onerror')});
