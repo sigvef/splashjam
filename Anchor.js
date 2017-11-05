@@ -9,7 +9,7 @@ function Anchor(game, position) {
   this.body = Matter.Bodies.circle(
     this.mesh.position.x,
     this.mesh.position.y,
-    10,
+    45,
     {isStatic: true});
   this.owner = 'neutral';
   this.body.restitution = 1;
