@@ -186,6 +186,27 @@ GameState.prototype.init = function() {
     this.scores.push(0);
   }
 
+
+  this.hud = new HUD(this);
+  this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+  this.directionalLight.position.set(-1, -1, -2);
+  this.scene.add(this.directionalLight);
+  this.directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+  this.directionalLight2.position.set(-0, -0, -2);
+  this.scene.add(this.directionalLight2);
+
+  this.anchors = [];
+  this.setupAnchors();
+  this.spawnGoal();
+
+  this.goalLight = new THREE.PointLight(0xffff00);
+  //this.scene.add(this.goalLight);
+};
+
+GameState.prototype.pause = function() {
+};
+
+GameState.prototype.setupAnchors = function() {
   this.anchorPositions = [[
     {x: -600, y: 0},
     {x: 600, y: 0},
@@ -229,31 +250,21 @@ GameState.prototype.init = function() {
     {x: 300, y: -400},
   ]][Math.random() * 4 | 0];
 
+  for(let anchor of this.anchors) {
+    Matter.World.remove(this.matterEngine.world, anchor.body);
+    this.scene.remove(anchor.mesh);
+  }
+
   this.anchors = [];
   for(let i = 0; i < this.anchorPositions.length; i++) {
     const anchor = new Anchor(this, this.anchorPositions[i]);
     this.anchors.push(anchor);
   }
-
-  this.hud = new HUD(this);
-  this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
-  this.directionalLight.position.set(-1, -1, -2);
-  this.scene.add(this.directionalLight);
-  this.directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
-  this.directionalLight2.position.set(-0, -0, -2);
-  this.scene.add(this.directionalLight2);
-
-  this.spawnGoal();
-
-  this.goalLight = new THREE.PointLight(0xffff00);
-  //this.scene.add(this.goalLight);
-};
-
-GameState.prototype.pause = function() {
-};
+}
 
 GameState.prototype.reset = function() {
   gtag('event', 'reset');
+  this.setupAnchors();
   this.startTime = +new Date();
   this.introTimer = 4;
   this.winner = undefined;
