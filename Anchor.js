@@ -14,7 +14,6 @@ function Anchor(game, position) {
   this.body.exitation = 0;
   this.body.deltaExitation = 0;
   this.body.gameObjectType = 'anchor';
-  this.owner = 'neutral';
   this.body.restitution = 1;
   Matter.World.add(this.game.matterEngine.world, this.body);
 }

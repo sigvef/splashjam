@@ -186,7 +186,6 @@ GameState.prototype.init = function() {
     this.scores.push(0);
   }
 
-
   this.hud = new HUD(this);
   this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
   this.directionalLight.position.set(-1, -1, -2);
@@ -260,7 +259,7 @@ GameState.prototype.setupAnchors = function() {
     const anchor = new Anchor(this, this.anchorPositions[i]);
     this.anchors.push(anchor);
   }
-}
+};
 
 GameState.prototype.reset = function() {
   gtag('event', 'reset');

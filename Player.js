@@ -364,24 +364,6 @@ Player.prototype.update = function() {
         {x: 0, y: 0.001});
     }
 
-    const angle = Matter.Vector.angle(
-        Matter.Vector.sub(
-          this.currentAnchor.body.position,
-          this.body.position),
-        {x: 1, y: 0});
-    this.grabRotationPrevious = this.grabRotationAmount;
-    let angleDelta = angle - (this.grabRotationPrevious % (Math.PI * 2));
-    if(angleDelta > Math.PI + 0.0000001) {
-      angleDelta -= Math.PI * 2;
-    }
-    if(angleDelta < -Math.PI - 0.00000001) {
-      angleDelta += Math.PI * 2;
-    }
-    this.grabRotationAmount += angleDelta;
-    this.currentAnchor.capturePercentage = Math.abs(this.grabRotationAmount) / Math.PI / 2;
-    if(this.currentAnchor.capturePercentage >= 1) {
-      this.currentAnchor.owner = this;
-    }
     this.updateRope();
   } else if (!jump) {
     for(let anchor of [...this.game.anchors, ...this.game.players]) {
@@ -406,13 +388,6 @@ Player.prototype.update = function() {
           this.spinster = Math.PI * 3;
         }
         this.lastAnchor = this.currentAnchor;
-        const angle = Matter.Vector.angle(
-            Matter.Vector.sub(
-              anchor.body.position,
-              this.body.position),
-            {x: 1, y: 0});
-        this.grabRotationPrevious = angle;
-        this.grabRotationAmount = 0;
         var group = Matter.Body.nextGroup(true);
         this.currentRope = Matter.Composites.stack(0, 0, 5, 1, 1, 1, (x, y) => {
           return Matter.Bodies.rectangle(
