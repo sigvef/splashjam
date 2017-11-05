@@ -11,6 +11,9 @@ function Anchor(game, position) {
     this.mesh.position.y,
     45,
     {isStatic: true});
+  this.body.exitation = 0;
+  this.body.deltaExitation = 0;
+  this.body.gameObjectType = 'anchor';
   this.owner = 'neutral';
   this.body.restitution = 1;
   Matter.World.add(this.game.matterEngine.world, this.body);
@@ -56,6 +59,9 @@ Anchor.prototype.render = function() {
     this.GoldenSymbolModel.material.emissiveIntensityTarget = 0;
   }
 
+  const scale = 1 + this.body.exitation * 0.3;
+  this.mesh.scale.set(scale, scale, scale);
+
   if(this.Hexagon1Model) {
     this.Hexagon1Model.material.emissiveIntensity = (
         this.Hexagon1Model.material.emissiveIntensity * 0.95 + this.Hexagon1Model.material.emissiveIntensityTarget * 0.05);
@@ -91,6 +97,9 @@ Anchor.prototype.render = function() {
 };
 
 Anchor.prototype.update = function() {
+  this.body.deltaExitation -= this.body.exitation * 0.1;
+  this.body.deltaExitation *= 0.8;
+  this.body.exitation += this.body.deltaExitation;
   if(this.goal) {
     goalAnchor = this;
     const angle = Math.random() * Math.PI * 2;

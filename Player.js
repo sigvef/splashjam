@@ -12,6 +12,7 @@ function Player(game, options) {
   this.body = Matter.Bodies.circle(
       0, 0, 10, { density: 0.004, frictionAir: 0.005});
   this.body.restitution = 1;
+  this.body.gameObjectType = 'player';
   Matter.Body.setPosition(this.body, this.options.position);
   this.currentAnchor = undefined;
   this.lastAnchor = null;
@@ -149,6 +150,18 @@ Player.prototype.activate = function(controls) {
   if(this.game.scores[this.options.id] === 4) {
     this.outerModel.material.emissiveIntensity = 1 + Math.sin(+new Date());
   }
+
+  Matter.Events.on(this.game.matterEngine, 'collisionStart', function(e) {
+    let length = e.pairs.length;
+    for(let i = 0; i < length; i++) {
+      let pair = e.pairs[i];
+      if(pair.bodyA.gameObjectType == 'player' && pair.bodyB.gameObjectType == 'anchor') {
+        pair.bodyB.exitation = 1;
+      } else if(pair.bodyB.gameObjectType == 'player' && pair.bodyA.gameObjectType == 'anchor') {
+        pair.bodyA.exitation = 1;
+      }
+    }
+  });
 };
 
 Player.prototype.render = function() {
