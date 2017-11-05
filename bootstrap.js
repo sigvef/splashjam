@@ -103,9 +103,9 @@ function loop() {
       JOYCONS.left = gamepad.index;
     }
   }
-  while (dt > 20) {
+  while (dt > 1000 / 60) {
     sm.update();
-    dt -= 20;
+    dt -= 1000 / 60;
   }
   /* clearing canvas */
   canvas.width = canvas.width;
