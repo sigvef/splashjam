@@ -70,6 +70,26 @@ let SoundManager = (function () {
             duration: getTimeAtBeat(1) * 1000
           },
           {
+            id: "bounce1",
+            startTime: getTimeAtBeat(68.75 * 4) * 1000,
+            duration: getTimeAtBeat(0.7 / 4) * 1000
+          },
+          {
+            id: "bounce2",
+            startTime: getTimeAtBeat(68.75 * 4 + 1 / 4) * 1000,
+            duration: getTimeAtBeat(0.7 / 4) * 1000
+          },
+          {
+            id: "bounce3",
+            startTime: getTimeAtBeat(68.75 * 4 + 2 / 4) * 1000,
+            duration: getTimeAtBeat(0.7 / 4) * 1000
+          },
+          {
+            id: "bounce4",
+            startTime: getTimeAtBeat(68.75 * 4 + 3 / 4) * 1000,
+            duration: getTimeAtBeat(0.7 / 4) * 1000
+          },
+          {
             id: "win",
             startTime: getTimeAtBeat(69 * 4) * 1000,
             duration: getTimeAtBeat(6) * 1000

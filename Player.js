@@ -151,13 +151,13 @@ Player.prototype.activate = function(controls) {
     this.outerModel.material.emissiveIntensity = 1 + Math.sin(+new Date());
   }
 
-  Matter.Events.on(this.game.matterEngine, 'collisionStart', function(e) {
+  Matter.Events.on(this.game.matterEngine, 'collisionStart', (e) => {
     let length = e.pairs.length;
-    for(let i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       let pair = e.pairs[i];
-      if(pair.bodyA.gameObjectType == 'player' && pair.bodyB.gameObjectType == 'anchor') {
+      if (pair.bodyA.gameObjectType == 'player' && pair.bodyB.gameObjectType == 'anchor') {
         pair.bodyB.exitation = 1;
-      } else if(pair.bodyB.gameObjectType == 'player' && pair.bodyA.gameObjectType == 'anchor') {
+      } else if (pair.bodyB.gameObjectType == 'player' && pair.bodyA.gameObjectType == 'anchor') {
         pair.bodyA.exitation = 1;
       }
     }

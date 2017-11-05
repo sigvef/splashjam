@@ -16,6 +16,10 @@ function Anchor(game, position) {
   this.body.gameObjectType = 'anchor';
   this.body.restitution = 1;
   Matter.World.add(this.game.matterEngine.world, this.body);
+
+  this.playBounceSound = function() {
+    SoundManager.playSound(`bounce${(0 | Math.random() * 4) + 1}`);
+  }.throttle(300, this);
 }
 
 Anchor.prototype.removeAsGoal = function() {
@@ -99,6 +103,9 @@ Anchor.prototype.update = function() {
   this.body.deltaExitation -= this.body.exitation * 0.1;
   this.body.deltaExitation *= 0.8;
   this.body.exitation += this.body.deltaExitation;
+  if (this.body.exitation > 0.9) {
+    this.playBounceSound();
+  }
   if(this.goal) {
     goalAnchor = this;
     const angle = Math.random() * Math.PI * 2;
