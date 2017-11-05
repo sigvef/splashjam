@@ -39,10 +39,10 @@ AiController.prototype.update = function() {
   //this.calculateFeatures();
   //this.fitness += this.player.body.speed / 100000;
   this.controls.jump = false;
-  this.controls.left = Math.sin(+new Date() * Math.PI / 1000) > 0;
-  this.controls.right = Math.sin(+new Date() * Math.PI / 1000) < 0;
-  this.controls.up = Math.cos(+new Date() * Math.PI / 1000) < 0;
-  this.controls.down = Math.cos(+new Date() * Math.PI / 1000) > 0;
+  this.controls.left = Math.sin(+new Date() * 1.2 * Math.PI / 1000) > 0;
+  this.controls.right = Math.sin(+new Date() * 1.2 * Math.PI / 1000) < 0;
+  this.controls.up = Math.cos(+new Date() * 1.2 * Math.PI / 1000) < 0;
+  this.controls.down = Math.cos(+new Date() * 1.2 * Math.PI / 1000) > 0;
 
   if (this.player.currentAnchor) {
     let currentAnchorDistanceToGoal = Matter.Vector.magnitudeSquared(
