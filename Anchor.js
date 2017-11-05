@@ -9,7 +9,7 @@ function Anchor(game, position) {
   this.body = Matter.Bodies.circle(
     this.mesh.position.x,
     this.mesh.position.y,
-    45,
+    10,
     {isStatic: true});
   this.body.exitation = 0;
   this.body.deltaExitation = 0;
