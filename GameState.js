@@ -124,7 +124,7 @@ GameState.prototype.init = function() {
   this.currentGoal = undefined;
 
   this.bgmesh = new THREE.Object3D();
-  this.scene.add(this.bgmesh);
+  //this.scene.add(this.bgmesh);
   this.bglayer0 = new THREE.Object3D();
   this.bglayer1 = new THREE.Object3D();
   this.bglayer2 = new THREE.Object3D();
@@ -394,6 +394,7 @@ GameState.prototype.spawnGoal = function() {
 };
 
 GameState.prototype.render = function(renderer) {
+  renderer.setClearColor(0x081426);
   this.bloompass.intensity = 2 + BEATPULSE;
   this.goalParticleSystem.render();
   for(let anchor of this.anchors) {
