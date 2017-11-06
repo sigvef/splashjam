@@ -734,7 +734,9 @@ GameState.prototype.update = function() {
   }
 
   this.goalParticleSystem.update();
-  Matter.Engine.update(this.matterEngine);
+  if (!this.winner) {
+    Matter.Engine.update(this.matterEngine);
+  }
   this.hud.update();
   this.hud.plane.position.x = this.camera.position.x;
   this.hud.plane.position.y = this.camera.position.y;

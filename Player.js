@@ -221,10 +221,6 @@ Player.prototype.respawn = function(playDeathSound = true) {
       player.disconnectRope();
     }
   }
-  if(this.game.winner !== undefined) {
-    // Don't alter the score or play the respawn sound if someone has already won
-    return;
-  }
   this.game.scores[this.options.id] = Math.max(0, this.game.scores[this.options.id] - 1);
   if (playDeathSound) {
     this.playRespawnSound();
