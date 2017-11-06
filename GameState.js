@@ -120,6 +120,7 @@ GameState.prototype.init = function() {
   this.matterEngine = Matter.Engine.create();
   this.goalParticleSystem = new ParticleSystem(this, {
     color: new THREE.Color(.2, .2, .2),
+    amount: 100
   });
   this.currentGoal = undefined;
 
