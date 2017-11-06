@@ -130,22 +130,6 @@ Player.prototype.activate = function(controls) {
   this.particleSystem.particles.visible = true;
   this.ropeMesh.visible = true;
 
-  for(let i = 0; i < 1000; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const amplitude = Math.random() * .2;
-    const dx = Math.cos(angle) * amplitude;
-    const dy = Math.sin(angle) * amplitude;
-    this.particleSystem.spawn({
-      x: this.body.position.x + dx - this.body.velocity.x * Math.random(),
-      y: this.body.position.y + dy - this.body.velocity.y * Math.random(),
-      z: 0,
-    }, {
-      x: dx,
-      y: dy,
-      z: 0,
-    });
-  }
-
   if(this.outerModel) {
     this.outerModel.material.emissiveIntensity = 0;
   }
