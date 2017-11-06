@@ -35,8 +35,8 @@ Anchor.prototype.removeAsGoal = function() {
 
 Anchor.prototype.setAsGoal = function() {
   this.goal = true;
-  this.mesh.add(this.GoldenSymbolModel);
-  if(this.GoldenSymbolModel) {
+  if (this.GoldenSymbolModel) {
+    this.mesh.add(this.GoldenSymbolModel);
     this.GoldenSymbolModel.targetStartPosition.copy(this.GoldenSymbolModel.position);
     this.GoldenSymbolModel.targetPosition.y = -75;
     this.GoldenSymbolModel.targetPosition.tStart = +new Date();
