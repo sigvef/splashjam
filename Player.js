@@ -259,21 +259,24 @@ Player.prototype.update = function() {
     });
     this.mesh.add(this.outerModel);
   }
-  for(let i = 0; i < Math.pow(this.game.scores[this.options.id], 2); i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const amplitude = Math.random() * .2;
-    const dx = Math.cos(angle) * amplitude;
-    const dy = Math.sin(angle) * amplitude;
-    this.particleSystem.spawn({
-      x: this.body.position.x + dx - this.body.velocity.x * Math.random(),
-      y: this.body.position.y + dy - this.body.velocity.y * Math.random(),
-      z: 0,
-    }, {
-      x: dx,
-      y: dy,
-      z: 0,
-    });
+  if (!this.game.winner) {
+    for(let i = 0; i < Math.pow(this.game.scores[this.options.id], 2); i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const amplitude = Math.random() * .2;
+      const dx = Math.cos(angle) * amplitude;
+      const dy = Math.sin(angle) * amplitude;
+      this.particleSystem.spawn({
+        x: this.body.position.x + dx - this.body.velocity.x * Math.random(),
+        y: this.body.position.y + dy - this.body.velocity.y * Math.random(),
+        z: 0,
+      }, {
+        x: dx,
+        y: dy,
+        z: 0,
+      });
+    }
   }
+
   this.particleSystem.update();
   this.innerModel.material.emissiveIntensity = BEATPULSE * 2;
   this.pointLight.intensity = 0.75 + BEATPULSE * 0.25;
