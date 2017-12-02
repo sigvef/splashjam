@@ -26,6 +26,7 @@ function ParticleSystem(game, options) {
     transparent:    true,
   });
   this.particles = new THREE.Points(this.particleGeometry, particleMaterial);
+  this.particles.frustumCulled = false;
   this.game.scene.add(this.particles);
 }
 
